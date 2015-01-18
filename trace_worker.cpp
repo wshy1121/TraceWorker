@@ -61,10 +61,10 @@ public:
 	void putInf(const char *strdata);
 	void putInf(int intData);
 	int packet();
+	int packet(char *&packet);
 	int unPacket(char *infs[]);
 	int unPacket(char *packet, char *infs[]);
 	inline char *getPacket();
-	inline int getpacketLen();
 private:
 	void I2CLen(int iLen, char *CLen, int CLenSize);
 	void C2ILen(char *CLen, int CLenSize, int &iLen);
@@ -87,10 +87,10 @@ CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 	dataInf.putInf(func_name);
 	dataInf.putInf(display_level);
 	dataInf.putInf("NULL");
-	dataInf.packet();
 	
-	char *packet = dataInf.getPacket();
-	int packetLen = dataInf.getpacketLen();
+	char *packet = NULL;
+	int packetLen = dataInf.packet(packet);
+	
 	CTraceWorkManager::instance()->send(packet, packetLen);
 	return ;
 }
@@ -105,11 +105,10 @@ CCandy::~CCandy()
 	dataInf.putInf("");
 	dataInf.putInf(0);
 	dataInf.putInf("");
-	dataInf.packet();
 	
-	char *packet = dataInf.getPacket();
-	int packetLen = dataInf.getpacketLen();
-	//CTraceWorkManager::instance()->send(packet, packetLen);
+	char *packet = NULL;
+	int packetLen = dataInf.packet(packet);
+	CTraceWorkManager::instance()->send(packet, packetLen);
 	return ;
 }
 
@@ -131,10 +130,9 @@ void CBugKiller::InsertTrace(int line, char *file_name, const char* fmt, ...)
 	dataInf.putInf("");
 	dataInf.putInf(0);
 	dataInf.putInf(content);
-	dataInf.packet();
 	
-	char *packet = dataInf.getPacket();
-	int packetLen = dataInf.getpacketLen();
+	char *packet = NULL;
+	int packetLen = dataInf.packet(packet);
 	CTraceWorkManager::instance()->send(packet, packetLen);
 	return ;
 }
@@ -166,10 +164,9 @@ void CBugKiller::DispAll()
 	dataInf.putInf("");
 	dataInf.putInf(0);
 	dataInf.putInf("backtrace");
-	dataInf.packet();
-	
-	char *packet = dataInf.getPacket();
-	int packetLen = dataInf.getpacketLen();
+
+	char *packet = NULL;
+	int packetLen = dataInf.packet(packet);
 	CTraceWorkManager::instance()->send(packet, packetLen);
 }
 
@@ -190,10 +187,9 @@ void CBugKiller::InsertTag(int line, char *file_name, const char* fmt, ...)
 	dataInf.putInf("");
 	dataInf.putInf(0);
 	dataInf.putInf(content);
-	dataInf.packet();
-	
-	char *packet = dataInf.getPacket();
-	int packetLen = dataInf.getpacketLen();
+
+	char *packet = NULL;
+	int packetLen = dataInf.packet(packet);
 	CTraceWorkManager::instance()->send(packet, packetLen);
 	return ;
 }
@@ -208,10 +204,10 @@ void CBugKiller::printfMemInfMap()
 	dataInf.putInf("");
 	dataInf.putInf(0);
 	dataInf.putInf("");
-	dataInf.packet();
+
 	
-	char *packet = dataInf.getPacket();
-	int packetLen = dataInf.getpacketLen();
+	char *packet = NULL;
+	int packetLen = dataInf.packet(packet);
 	CTraceWorkManager::instance()->send(packet, packetLen);
 }
 
@@ -344,8 +340,10 @@ int CBase::usleep(int micro_second)
 }
 
 
-CLogDataInf::CLogDataInf() : m_lenSize(4), m_packet(NULL), m_packetLen(0), m_infsNum(0)
+CLogDataInf::CLogDataInf() : m_lenSize(4), m_packet(NULL),m_infsNum(0)
 {
+	m_packet = (char *)malloc(32*1024);
+	m_packetLen = m_lenSize;
 }
 
 
@@ -389,14 +387,14 @@ void CLogDataInf::C2ILen(char *CLen, int CLenSize, int &iLen)
 
 void CLogDataInf::putInf(char *strdata)
 {
-	if (m_infsNum >= INF_SIZE)
-	{
-		return ;
-	}
-	m_infs[m_infsNum++] = strdata;
-	m_packetLen += strlen(strdata) + 1 + m_lenSize;
-	
-	printf("%s m_packetLen  %d %d\n", strdata, strlen(strdata), m_packetLen);
+	int dataLen = strlen(strdata) + 1;
+
+	I2CLen(dataLen + m_lenSize, m_packet+m_packetLen, m_lenSize);
+	m_packetLen += m_lenSize;
+
+	memcpy(m_packet+m_packetLen, strdata, dataLen);
+	m_packetLen += dataLen;
+
 }
 
 void CLogDataInf::putInf(const char *strdata)
@@ -411,7 +409,7 @@ void CLogDataInf::putInf(int intData)
 	snprintf(strData, sizeof(strData), "%d", intData);
 	putInf(strData);
 }
-
+#if 0
 int CLogDataInf::packet()
 {
 	if (m_packet)
@@ -443,6 +441,7 @@ int CLogDataInf::packet()
 	printf("mallocLen  pos  %d  %d\n", mallocLen, pos);
 	return mallocLen;
 }
+#endif
 int CLogDataInf::unPacket(char *infs[])
 {
 	return unPacket(m_packet, infs);
@@ -477,13 +476,15 @@ int CLogDataInf::unPacket(char *packet, char *infs[])
 	return totalLen;
 }
 
-char *CLogDataInf::getPacket()
+int CLogDataInf::packet(char *&packet)
 {
-	return m_packet;
-}
-int CLogDataInf::getpacketLen()
-{
-	return m_packetLen + m_lenSize + m_lenSize;
+	m_packetLen += m_lenSize;
+
+	I2CLen(m_packetLen, m_packet, m_lenSize);
+	I2CLen(m_packetLen, m_packet+m_packetLen-m_lenSize, m_lenSize);
+	
+	packet = m_packet;
+	return m_packetLen;
 }
 
 
