@@ -60,11 +60,9 @@ public:
 	void putInf(char *strdata);
 	void putInf(const char *strdata);
 	void putInf(int intData);
-	int packet();
 	int packet(char *&packet);
 	int unPacket(char *infs[]);
 	int unPacket(char *packet, char *infs[]);
-	inline char *getPacket();
 private:
 	void I2CLen(int iLen, char *CLen, int CLenSize);
 	void C2ILen(char *CLen, int CLenSize, int &iLen);
@@ -409,39 +407,7 @@ void CLogDataInf::putInf(int intData)
 	snprintf(strData, sizeof(strData), "%d", intData);
 	putInf(strData);
 }
-#if 0
-int CLogDataInf::packet()
-{
-	if (m_packet)
-	{
-		free(m_packet);
-		m_packet = NULL;
-	}
-	int mallocLen = m_lenSize + m_packetLen + m_lenSize;
-	m_packet = (char *)malloc(mallocLen);
 
-	int pos = 0;
-	printf("mallocLen  pos  %d  %d\n", mallocLen, pos);
-	I2CLen(mallocLen, m_packet+pos, m_lenSize);
-	pos += m_lenSize;
-
-	char *inf = NULL;
-	int infLen = 0;
-	for (int i=0; i<m_infsNum; ++i)
-	{
-		inf = m_infs[i];
-		infLen = strlen(inf) + 1;
-		I2CLen(infLen, m_packet+pos, m_lenSize);
-		pos += m_lenSize;
-		printf("inf  %s\n", inf);
-		memcpy(m_packet+pos, inf, infLen);
-		pos += infLen;
-	}
-	I2CLen(mallocLen, m_packet+pos, m_lenSize);
-	printf("mallocLen  pos  %d  %d\n", mallocLen, pos);
-	return mallocLen;
-}
-#endif
 int CLogDataInf::unPacket(char *infs[])
 {
 	return unPacket(m_packet, infs);
@@ -459,15 +425,14 @@ int CLogDataInf::unPacket(char *packet, char *infs[])
 	for (; i<totalLen-m_lenSize; )
 	{
 		C2ILen(packet+i,m_lenSize,infLen);
-		i += m_lenSize;
-		inf = packet + i;
+		inf = packet + i + m_lenSize;
 		i += infLen;
 
 		infs[infsNum++] = inf;
 	}
 	
 	C2ILen(packet+i,m_lenSize,infLen);
-	if (infsNum != m_infsNum || infLen != totalLen)
+	if (infLen != totalLen)
 	{
 		infs[0] = NULL;
 		return 0;
