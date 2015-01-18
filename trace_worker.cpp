@@ -19,7 +19,6 @@ typedef int SOCKET;
 #include "trace_worke.h"
 
 static SOCKET m_socketClient;
-const char *dataFormat = "{\"opr\" : \"%s\", \"threadId\" : %d, \"line\" : %d, \"fileName\" : \"%s\", \"funcName\" : \"%s\", \"displayLevel\" : %d, \"content\" : \"%s\"}";
 
 class CBase
 {
