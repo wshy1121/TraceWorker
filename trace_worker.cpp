@@ -14,8 +14,6 @@ typedef int SOCKET;
 #endif
 #include "trace_worke.h"
 
-static SOCKET m_socketClient;
-static CBase::pthread_mutex_t socketMutex;
 
 
 
@@ -27,6 +25,9 @@ public:
 	int send(char *szText,int len);
 private:
 	CTraceWorkManager();
+private:	
+	SOCKET m_socketClient;
+	CBase::pthread_mutex_t socketMutex;
 };
 
 
