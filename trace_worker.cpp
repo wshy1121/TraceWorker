@@ -12,31 +12,11 @@
 #include <string>
 typedef int SOCKET;
 #endif
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
 #include "trace_worke.h"
 
 static SOCKET m_socketClient;
+static CBase::pthread_mutex_t socketMutex;
 
-class CBase
-{
-public:
-#ifdef WIN32
-	typedef unsigned long pthread_t;
-	typedef int  pthread_attr_t;
-#else
-	typedef ::pthread_t  pthread_t;
-	typedef ::pthread_attr_t  pthread_attr_t;
-#endif
-public:
-	static int snprintf(char *str, size_t size, const char *format, ...);
-	static pthread_t pthread_self(void);
-	static int vsnprintf(char *str, size_t size, const char *format, va_list ap);
-	static int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg);
-	static int usleep(int micro_second);
-};
 
 
 class CTraceWorkManager
@@ -235,6 +215,7 @@ CTraceWorkManager *CTraceWorkManager::instance()
 
 bool CTraceWorkManager::startServer(const char *sip)
 {
+	CBase::pthread_mutex_init(&socketMutex, NULL);
 	m_socketClient = socket(AF_INET, SOCK_STREAM, 0);
 	if(-1 == m_socketClient)
 	{
@@ -261,7 +242,9 @@ int CTraceWorkManager::send(char *szText,int len)
 	cnt=len;
 	while(cnt>0)
 	{
+		CBase::pthread_mutex_lock(&socketMutex);
 		rc=::send(m_socketClient,szText,cnt,0);
+		CBase::pthread_mutex_unlock(&socketMutex);
 		if(rc==-1)
 		{
 			return -1;
@@ -336,6 +319,38 @@ int CBase::usleep(int micro_second)
 
 }
 
+int CBase::pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
+{
+#ifdef WIN32
+	InitializeCriticalSection(mutex);
+	return 0;
+#else
+	return ::pthread_mutex_init(mutex, attr);
+#endif
+
+}
+
+int CBase::pthread_mutex_lock(pthread_mutex_t *mutex)
+{
+#ifdef WIN32
+	EnterCriticalSection(mutex);
+	return 0;
+#else
+	return ::pthread_mutex_lock(mutex);
+#endif
+
+}
+
+int CBase::pthread_mutex_unlock(pthread_mutex_t *mutex)
+{
+#ifdef WIN32
+	LeaveCriticalSection(mutex);
+	return 0;
+#else
+	return ::pthread_mutex_unlock(mutex);
+#endif
+
+}
 
 CLogDataInf::CLogDataInf() : m_lenSize(4), m_packet(NULL),m_infsNum(0)
 {
