@@ -8,6 +8,7 @@
 #include <execinfo.h>
 #include <stdarg.h>
 #include <pthread.h>
+typedef int SOCKET;
 #endif
 
 #include <stdlib.h>
@@ -67,10 +68,6 @@ private:
 #endif
 
 
-#ifdef WIN32
-#else
-typedef int SOCKET;
-#endif
 
 #define INF_SIZE 16 
 
