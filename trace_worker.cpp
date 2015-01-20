@@ -16,45 +16,6 @@ typedef int SOCKET;
 
 
 
-
-class CTraceWorkManager
-{
-public:
-	static CTraceWorkManager *instance();
-	bool startServer(const char *ip);
-	int send(char *szText,int len);
-private:
-	CTraceWorkManager();
-private:	
-	SOCKET m_socketClient;
-	CBase::pthread_mutex_t socketMutex;
-};
-
-
-#define INF_SIZE 16 
-class CLogDataInf
-{
-public:
-	CLogDataInf();
-	~CLogDataInf();
-	void putInf(char *strdata);
-	void putInf(const char *strdata);
-	void putInf(int intData);
-	int packet(char *&packet);
-	int unPacket(char *infs[]);
-	int unPacket(char *packet, char *infs[]);
-private:
-	void I2CLen(int iLen, char *CLen, int CLenSize);
-	void C2ILen(char *CLen, int CLenSize, int &iLen);
-private:
-	int m_lenSize;	
-	char *m_infs[INF_SIZE];
-	char *m_packet;
-	int m_packetLen;
-	int m_infsNum;
-};
-
-	
 CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 {
 	CLogDataInf dataInf;
@@ -117,18 +78,21 @@ void CBugKiller::InsertTrace(int line, char *file_name, const char* fmt, ...)
 
 void CBugKiller::InsertHex(int line, char *file_name, char *psBuf, int nBufLen)
 {
-#if 0
-	RECV_DATA *pRecvData = CTimeCalcInfManager::instance()->createRecvData(nBufLen);
-	TimeCalcInf *pCalcInf = &pRecvData->calcInf;
+	char str[4096];
+	CTraceWorkManager::instance()->InsertHex(psBuf, nBufLen, str, sizeof(str));
 
-	pCalcInf->m_opr = TimeCalcInf::e_insertHex;
-	pCalcInf->m_threadId = base::pthread_self();
-	pCalcInf->m_line = line;
-	pCalcInf->m_fileName = file_name;
-	memcpy(pCalcInf->m_pContent, psBuf, nBufLen);
+	CLogDataInf dataInf;
+	dataInf.putInf((char *)"insertTrace");
+	dataInf.putInf(CBase::pthread_self());
+	dataInf.putInf(line);
+	dataInf.putInf(file_name);
+	dataInf.putInf("");
+	dataInf.putInf(0);
+	dataInf.putInf(str);
 
-	CTimeCalcInfManager::instance()->pushRecvData(pRecvData);
-#endif	
+	char *packet = NULL;
+	int packetLen = dataInf.packet(packet);
+	CTraceWorkManager::instance()->send(packet, packetLen);
 	return ;
 }
 
@@ -261,6 +225,60 @@ int CTraceWorkManager::send(char *szText,int len)
 }
 
 
+void CTraceWorkManager::InsertHex(char *psBuf, int nBufLen, char *str, int strLen)
+{
+	/* save log msg in file */
+	CBase::snprintf(str, strLen, "hex%s:len=%4d\n", __FUNCTION__, nBufLen);
+
+	/* save log msg in file */
+	int j = 0;
+	char sLine[100], sTemp[12];
+	for	(int i=0; i<nBufLen; i++)
+	{
+		
+		/* initialize a new line */
+		if (j==0)
+		{
+			memset (sLine,	' ', sizeof(sLine));
+			CBase::snprintf (sTemp,	sizeof(sTemp), "%04d:", i );
+			memcpy (sLine, sTemp, 5);
+			CBase::snprintf (sTemp, sizeof(sTemp), ":%04d", i+15 );
+			memcpy (sLine+72, sTemp, 5);
+		}
+
+		/* output psBuf value in hex */
+		CBase::snprintf(sTemp, sizeof(sTemp), "%02X ", (unsigned	char)psBuf[i]);
+		memcpy( &sLine[j*3+5+(j>7)], sTemp, 3);
+
+		/* output psBuf in ascii */
+		if ( isprint (psBuf[i]))
+		{
+			sLine[j+55+(j>7)]=psBuf[i];
+		}
+		else
+		{
+			sLine[j+55+(j>7)]='.';
+		}
+		j++;
+
+		/* output the line to file */
+		if (j==16)
+		{
+			sLine[77]=0;
+			CBase::snprintf(str+strlen(str), sizeof(str)-strlen(str), "%s\n", sLine);
+			j=0;
+		}
+	}
+
+	/* last line */
+	if (j)
+	{
+		sLine[77]=0;
+		CBase::snprintf(str+strlen(str), sizeof(str)-strlen(str), "%s\n",	sLine);
+	}
+
+}
+
 
 int CBase::snprintf(char *str, size_t size, const char *format, ...)
 {
@@ -292,6 +310,20 @@ int CBase::vsnprintf(char *str, size_t size, const char *format, va_list ap)
 #else
 	return ::vsnprintf(str, size, format, ap);
 #endif
+}
+
+char *CBase::strcpy(char *dest, const char *src)
+{
+#ifdef WIN32
+	if (dest != NULL)
+	{
+		strcpy_s(dest, strlen(src)+1, src);
+	}
+	return dest;
+#else
+	return ::strcpy(dest, src);
+#endif
+
 }
 
 int CBase::pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg)

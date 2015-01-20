@@ -14,30 +14,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-class CBase
-{
-public:
-#ifdef WIN32
-	typedef unsigned long pthread_t;
-	typedef int  pthread_attr_t;
-	typedef CRITICAL_SECTION  pthread_mutex_t;
-	typedef int  pthread_mutexattr_t;
-#else
-	typedef ::pthread_t  pthread_t;
-	typedef ::pthread_attr_t  pthread_attr_t;
-	typedef ::pthread_mutex_t  pthread_mutex_t;
-	typedef ::pthread_mutexattr_t  pthread_mutexattr_t;
-#endif
-public:
-	static int snprintf(char *str, size_t size, const char *format, ...);
-	static pthread_t pthread_self(void);
-	static int vsnprintf(char *str, size_t size, const char *format, va_list ap);
-	static int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg);
-	static int usleep(int micro_second);
-	static int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
-	static int pthread_mutex_lock(pthread_mutex_t *mutex);
-	static int pthread_mutex_unlock(pthread_mutex_t *mutex);
-};
 
 class CCandy
 {
@@ -89,6 +65,79 @@ private:
 #define trace_unworker()    
 #define trace_worker()   
 #endif
+
+
+#ifdef WIN32
+#else
+typedef int SOCKET;
+#endif
+
+#define INF_SIZE 16 
+
+class CBase
+{
+public:
+#ifdef WIN32
+	typedef unsigned long pthread_t;
+	typedef int  pthread_attr_t;
+	typedef CRITICAL_SECTION  pthread_mutex_t;
+	typedef int  pthread_mutexattr_t;
+#else
+	typedef ::pthread_t  pthread_t;
+	typedef ::pthread_attr_t  pthread_attr_t;
+	typedef ::pthread_mutex_t  pthread_mutex_t;
+	typedef ::pthread_mutexattr_t  pthread_mutexattr_t;
+#endif
+public:
+	static int snprintf(char *str, size_t size, const char *format, ...);
+	static pthread_t pthread_self(void);
+	static int vsnprintf(char *str, size_t size, const char *format, va_list ap);
+	static char *strcpy(char *dest, const char *src);
+	static int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg);
+	static int usleep(int micro_second);
+	static int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
+	static int pthread_mutex_lock(pthread_mutex_t *mutex);
+	static int pthread_mutex_unlock(pthread_mutex_t *mutex);
+};
+
+
+class CTraceWorkManager
+{
+public:
+	static CTraceWorkManager *instance();
+	bool startServer(const char *ip);
+	int send(char *szText,int len);
+	void InsertHex(char *psBuf, int nBufLen, char *str, int strLen);
+private:
+	CTraceWorkManager();
+private:	
+	SOCKET m_socketClient;
+	CBase::pthread_mutex_t socketMutex;
+};
+
+
+class CLogDataInf
+{
+public:
+	CLogDataInf();
+	~CLogDataInf();
+	void putInf(char *strdata);
+	void putInf(const char *strdata);
+	void putInf(int intData);
+	int packet(char *&packet);
+	int unPacket(char *infs[]);
+	int unPacket(char *packet, char *infs[]);
+private:
+	void I2CLen(int iLen, char *CLen, int CLenSize);
+	void C2ILen(char *CLen, int CLenSize, int &iLen);
+private:
+	int m_lenSize;	
+	char *m_infs[INF_SIZE];
+	char *m_packet;
+	int m_packetLen;
+	int m_infsNum;
+};
+
 
 
 #endif
