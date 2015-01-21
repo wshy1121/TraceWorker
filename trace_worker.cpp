@@ -413,7 +413,7 @@ void CLogDataInf::I2CLen(int iLen, char *CLen, int CLenSize)
 	memset(CLen, 0, CLenSize);
 	for (int i=0; i<CLenSize; ++i)
 	{
-		CLen[i] = iLen % 256;
+		CLen[i] = iLen;
 		iLen = iLen >> 8;
 		if (iLen == 0)
 		{
