@@ -427,11 +427,9 @@ void CLogDataInf::I2CLen(int iLen, char *CLen, int CLenSize)
 void CLogDataInf::C2ILen(char *CLen, int CLenSize, int &iLen)
 {
 	iLen = 0;
-	int x256 = 1;
 	for (int i=0; i<CLen[CLenSize-1]; ++i)
 	{
-		iLen += (unsigned char)(CLen[i])*x256;
-		x256 = x256 << 8;
+		iLen += (unsigned char)(CLen[i]) << (i<<3);
 	}
 	return ;
 }
