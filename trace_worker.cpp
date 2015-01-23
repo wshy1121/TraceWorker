@@ -153,6 +153,23 @@ void CBugKiller::printfMemInfMap()
 	CTraceWorkManager::instance()->send(packet, packetLen);
 }
 
+void CBugKiller::openFile(const char *fileName)
+{
+	CLogDataInf dataInf;
+	dataInf.putInf((char *)"openFile");
+	dataInf.putInf(CBase::pthread_self());
+	dataInf.putInf(0);
+	dataInf.putInf("");
+	dataInf.putInf("");
+	dataInf.putInf(0);
+	dataInf.putInf(fileName);
+
+	char *packet = NULL;
+	int packetLen = dataInf.packet(packet);
+	CTraceWorkManager::instance()->send(packet, packetLen);
+}
+
+
 void CBugKiller::printfStackInfo(int line, char *file_name)
 {
 	InsertTrace(line, file_name, "backTrace youself");
@@ -160,7 +177,14 @@ void CBugKiller::printfStackInfo(int line, char *file_name)
 
 bool CBugKiller::startServer(const char *sip)
 {
-	return CTraceWorkManager::instance()->startServer(sip);
+	bool bRet = CTraceWorkManager::instance()->startServer(sip);
+	if (!bRet)
+	{
+		return bRet;
+	}
+
+	openFile("Debug11.cpp");
+	return bRet;
 }
 
 

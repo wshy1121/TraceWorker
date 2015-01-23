@@ -8,6 +8,7 @@ void fun1()
 	trace_printf(testData);	
 	trace_printf("get_stack  %s", "stack.c_str()");
 	trace_str(testData, sizeof(testData));
+	trace_tag(testData);
 	{
 		trace_printf(testData);
 		trace_level(4);
@@ -56,7 +57,6 @@ int main()
 	char str[4096];
 	CTraceWorkManager::instance()->InsertHex(testData, sizeof(testData), str, sizeof(str));
 
-	return 0;
 	int dataLen = sizeof(testData);
 	memset(testData, 'A', dataLen);
 	testData[dataLen-1] = '\n';

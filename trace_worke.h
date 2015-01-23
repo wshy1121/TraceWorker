@@ -32,6 +32,7 @@ public:
 	static void DispAll();
 	static void InsertTag(int line, char *file_name, const char* fmt, ...);
 	static void printfMemInfMap();
+	static void openFile(const char *fileName);
 	static void printfStackInfo(int line, char *file_name);
 	static bool startServer(const char *ip);
 private:
