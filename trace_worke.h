@@ -15,6 +15,7 @@ typedef int SOCKET;
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 class CCandy
 {
@@ -107,6 +108,7 @@ public:
 	bool startServer(const char *ip);
 	int send(char *szText,int len);
 	void InsertHex(char *psBuf, int nBufLen, char *str, int strLen);
+	std::string &getBackTrace(std::string &backTrace);
 private:
 	CTraceWorkManager();
 private:	

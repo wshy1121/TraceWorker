@@ -5,6 +5,7 @@ char testData[16*1024];
 //≤‚ ‘CTimeCalc π”√
 void fun1()
 {	trace_worker();
+	trace_stack();
 	trace_printf(testData);	
 	trace_printf("get_stack  %s", "stack.c_str()");
 	trace_str(testData, sizeof(testData));

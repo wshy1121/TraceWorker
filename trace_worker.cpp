@@ -172,7 +172,9 @@ void CBugKiller::openFile(const char *fileName)
 
 void CBugKiller::printfStackInfo(int line, char *file_name)
 {
-	InsertTrace(line, file_name, "backTrace youself");
+	std::string backTrace;
+	CTraceWorkManager::instance()->getBackTrace(backTrace);
+	InsertTrace(line, file_name, backTrace.c_str());
 }
 
 bool CBugKiller::startServer(const char *sip)
@@ -310,6 +312,21 @@ void CTraceWorkManager::InsertHex(char *psBuf, int nBufLen, char *str, int strLe
 
 }
 
+std::string &CTraceWorkManager::getBackTrace(std::string &backTrace)
+{
+	void *stack_addr[32];
+	int layer;
+	int i;
+	char tmp[256];
+	backTrace = "addr2line -e ./Challenge_Debug -f -C  ";
+	layer = CBase::backtrace(stack_addr, 32);
+	for(i = 3; i < layer; i++)
+	{
+		CBase::snprintf(tmp, sizeof(tmp), "%p  ", stack_addr[i]);
+		backTrace += tmp;
+	}
+	return backTrace;
+}
 
 int CBase::snprintf(char *str, size_t size, const char *format, ...)
 {
