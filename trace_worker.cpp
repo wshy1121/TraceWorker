@@ -416,6 +416,17 @@ int CBase::pthread_mutex_unlock(pthread_mutex_t *mutex)
 
 }
 
+int CBase::backtrace(void **buffer, int size)
+{
+#ifdef WIN32
+	assert(0);
+	return 0;
+#else
+	return ::backtrace(buffer, size);
+#endif
+}
+
+
 CLogDataInf::CLogDataInf() : m_lenSize(4), m_packet(NULL),m_infsNum(0)
 {
 	m_packet = (char *)malloc(32*1024);
