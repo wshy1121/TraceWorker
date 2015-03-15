@@ -10,6 +10,13 @@
 #include <stdio.h>
 #include <tchar.h>
 
+#ifdef WIN32
+#include <windows.h>
+#include <process.h>
+#else
+#include <unistd.h>
+#include <pthread.h>
+#endif
 
 
 // TODO: 在此处引用程序需要的其他头文件

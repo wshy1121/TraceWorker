@@ -1,8 +1,5 @@
-//#include "stdafx.h"
+#include "stdafx.h"
 #ifdef WIN32
-
-#include<ws2tcpip.h>
-#include <winsock2.h>
 #pragma comment(lib,"ws2_32.lib")
 #else
 #include <arpa/inet.h>
@@ -436,7 +433,7 @@ int CBase::pthread_mutex_unlock(pthread_mutex_t *mutex)
 int CBase::backtrace(void **buffer, int size)
 {
 #ifdef WIN32
-	assert(0);
+	//assert(0);
 	return 0;
 #else
 	return ::backtrace(buffer, size);
@@ -509,7 +506,7 @@ void CLogDataInf::putInf(const char *strdata)
 void CLogDataInf::putInf(int intData)
 {
 	char strData[64];
-	snprintf(strData, sizeof(strData), "%d", intData);
+	CBase::snprintf(strData, sizeof(strData), "%d", intData);
 	putInf(strData);
 }
 

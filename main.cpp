@@ -1,5 +1,5 @@
+#include "stdafx.h"
 #include "trace_worke.h"
-#include <unistd.h>
 
 char testData[16*1024];
 //≤‚ ‘CTimeCalc π”√
@@ -47,9 +47,13 @@ void fun0(int count)
 }
 
 void* test1(void *pArg)
-{	
-	trace_worker();
-	fun0(100);
+{
+	while (1)
+	{
+		trace_worker();
+		fun0(100);
+		CBase::usleep(1000*1000);
+	}
 	return NULL;
 }
 
@@ -62,20 +66,16 @@ int main()
 	memset(testData, 'A', dataLen);
 	testData[dataLen-1] = '\n';
 	
-	CBugKiller::startServer("10.6.5.63");
+	CBugKiller::startServer("127.0.0.1");
 	const int threadNum = 10;
 	CBase::pthread_t thread_id[threadNum];	
+
+	for (int i=0; i<threadNum; ++i)
+	{
+		CBase::pthread_create(&thread_id[i], NULL,test1,NULL);
+	}
 	while (1)
 	{
-		for (int i=0; i<threadNum; ++i)
-		{
-			::pthread_create(&thread_id[i], NULL,test1,NULL);
-		}
-		//-------------------------------------------------------------
-		for (int i=0; i<threadNum; ++i)
-		{
-			::pthread_join(thread_id[i], NULL);
-		}
 		CBase::usleep(1000*1000);
 	}
 	return 0;

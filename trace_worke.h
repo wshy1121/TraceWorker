@@ -3,7 +3,6 @@
 
 #ifdef WIN32
 #include <assert.h>
-#include <process.h>
 #else
 #include <execinfo.h>
 #include <stdarg.h>
