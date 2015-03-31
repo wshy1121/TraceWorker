@@ -2,6 +2,8 @@
 #define _TRACE_WORK_H_
 
 #ifdef WIN32
+#include <windows.h>
+#include <process.h>
 #include <assert.h>
 #else
 #include <execinfo.h>
