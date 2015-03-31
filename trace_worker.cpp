@@ -204,23 +204,39 @@ CTraceWorkManager *CTraceWorkManager::instance()
 bool CTraceWorkManager::startServer(const char *sip)
 {
 	CBase::pthread_mutex_init(&socketMutex, NULL);
-	m_socketClient = socket(AF_INET, SOCK_STREAM, 0);
+	m_socketClient = connect(sip, 8889);
 	if(-1 == m_socketClient)
 	{
 		return false;
 	}
 
+	return true;
+}
+
+SOCKET CTraceWorkManager::connect(const char *sip, int port)
+{
+	SOCKET socketClient = socket(AF_INET, SOCK_STREAM, 0);
+	if(-1 == socketClient)
+	{
+		return -1;
+	}
+
 	struct sockaddr_in addr;
 	addr.sin_family 		= AF_INET;
 	addr.sin_addr.s_addr	= inet_addr(sip);
-	addr.sin_port			= htons(8889);
+	addr.sin_port			= htons(port);
 	
-	int ret = ::connect(m_socketClient, (struct sockaddr *) & addr, sizeof(sockaddr_in));
+	int ret = ::connect(socketClient, (struct sockaddr *) & addr, sizeof(sockaddr_in));
 	if(-1 == ret)
 	{
-		return false;
+		return -1;
 	}
-	return true;
+	return socketClient;
+}
+
+int CTraceWorkManager::disConnect(SOCKET socket)
+{
+	return CBase::close(socket);
 }
 
 int CTraceWorkManager::send(char *szText,int len)
@@ -440,6 +456,14 @@ int CBase::backtrace(void **buffer, int size)
 #endif
 }
 
+int CBase::close(int fd)
+{
+#if WIN32
+	return closesocket(fd);
+#else
+	return ::close(fd);
+#endif
+}
 
 CLogDataInf::CLogDataInf() : m_lenSize(4), m_packet(NULL),m_infsNum(0)
 {

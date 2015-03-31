@@ -99,6 +99,7 @@ public:
 	static int pthread_mutex_lock(pthread_mutex_t *mutex);
 	static int pthread_mutex_unlock(pthread_mutex_t *mutex);
 	static int backtrace(void **buffer, int size);
+	static int close(int fd);
 };
 
 
@@ -111,7 +112,9 @@ public:
 	void InsertHex(char *psBuf, int nBufLen, char *str, int strLen);
 	std::string &getBackTrace(std::string &backTrace);
 private:
-	CTraceWorkManager();
+	CTraceWorkManager();	
+	SOCKET connect(const char *sip, int port);
+	int disConnect(SOCKET socket);
 private:	
 	SOCKET m_socketClient;
 	CBase::pthread_mutex_t socketMutex;
