@@ -9,7 +9,7 @@
 #include <string>
 typedef int SOCKET;
 #endif
-#include "trace_worke.h"
+#include "trace_worker.h"
 
 
 

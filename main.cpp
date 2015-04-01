@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "trace_worke.h"
+#include "trace_worker.h"
 
 char testData[16*1024];
 //≤‚ ‘CTimeCalc π”√
