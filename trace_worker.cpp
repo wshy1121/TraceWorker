@@ -15,36 +15,47 @@ typedef int SOCKET;
 
 CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 {
+	char sTid[16];
+	char sLine[8];
+	char sLevel[8];
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
+	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
+	CBase::snprintf(sLevel, sizeof(sLevel), "%d", display_level);
+	
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"createCandy");
-	dataInf.putInf(CBase::pthread_self());
-	dataInf.putInf(line);
+	dataInf.putInf(sTid);
+	dataInf.putInf(sLine);
 	dataInf.putInf(file_name);
 	dataInf.putInf(func_name);
-	dataInf.putInf(display_level);
+	dataInf.putInf(sLevel);
 	dataInf.putInf("NULL");
 	
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
-	
 	CTraceWorkManager::instance()->send(packet, packetLen);
+	
+	CTraceWorkManager::instance()->receiveInfData(&dataInf);
 	return ;
 }
 
 CCandy::~CCandy()
 {
+	char sTid[16];
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"destroyCandy");
-	dataInf.putInf(CBase::pthread_self());
-	dataInf.putInf(0);
+	dataInf.putInf(sTid);
+	dataInf.putInf("0");
 	dataInf.putInf("");
 	dataInf.putInf("");
-	dataInf.putInf(0);
+	dataInf.putInf("0");
 	dataInf.putInf("");
 	
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
 	CTraceWorkManager::instance()->send(packet, packetLen);
+	CTraceWorkManager::instance()->receiveInfData(&dataInf);
 	return ;
 }
 
@@ -58,18 +69,24 @@ void CBugKiller::InsertTrace(int line, char *file_name, const char* fmt, ...)
 	CBase::vsnprintf(content,sizeof(content), fmt, ap);
 	va_end(ap);
 
+	char sTid[16];
+	char sLine[8];
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
+	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
+	
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"insertTrace");
-	dataInf.putInf(CBase::pthread_self());
-	dataInf.putInf(line);
+	dataInf.putInf(sTid);
+	dataInf.putInf(sLine);
 	dataInf.putInf(file_name);
 	dataInf.putInf("");
-	dataInf.putInf(0);
+	dataInf.putInf("0");
 	dataInf.putInf(content);
 	
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
 	CTraceWorkManager::instance()->send(packet, packetLen);
+	CTraceWorkManager::instance()->receiveInfData(&dataInf);
 	return ;
 }
 
@@ -78,35 +95,45 @@ void CBugKiller::InsertHex(int line, char *file_name, char *psBuf, int nBufLen)
 	char str[4096];
 	CTraceWorkManager::instance()->InsertHex(psBuf, nBufLen, str, sizeof(str));
 
+	char sTid[16];
+	char sLine[8];
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
+	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
+
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"insertTrace");
-	dataInf.putInf(CBase::pthread_self());
-	dataInf.putInf(line);
+	dataInf.putInf(sTid);
+	dataInf.putInf(sLine);
 	dataInf.putInf(file_name);
 	dataInf.putInf("");
-	dataInf.putInf(0);
+	dataInf.putInf("0");
 	dataInf.putInf(str);
 
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
 	CTraceWorkManager::instance()->send(packet, packetLen);
+	CTraceWorkManager::instance()->receiveInfData(&dataInf);	
 	return ;
 }
 
 void CBugKiller::DispAll()
 {
+	char sTid[16];
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"dispAll");
-	dataInf.putInf(CBase::pthread_self());
-	dataInf.putInf(0);
+	dataInf.putInf(sTid);
+	dataInf.putInf("0");
 	dataInf.putInf("");
 	dataInf.putInf("");
-	dataInf.putInf(0);
+	dataInf.putInf("0");
 	dataInf.putInf("backtrace");
 
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
 	CTraceWorkManager::instance()->send(packet, packetLen);
+	CTraceWorkManager::instance()->receiveInfData(&dataInf);
+	return ;	
 }
 
 
@@ -118,52 +145,66 @@ void CBugKiller::InsertTag(int line, char *file_name, const char* fmt, ...)
 	CBase::vsnprintf(content,sizeof(content), fmt, ap);
 	va_end(ap);
 
+	char sTid[16];
+	char sLine[8];
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
+	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
+
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"insertTag");
-	dataInf.putInf(CBase::pthread_self());
-	dataInf.putInf(line);
+	dataInf.putInf(sTid);
+	dataInf.putInf(sLine);
 	dataInf.putInf(file_name);
 	dataInf.putInf("");
-	dataInf.putInf(0);
+	dataInf.putInf("0");
 	dataInf.putInf(content);
 
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
 	CTraceWorkManager::instance()->send(packet, packetLen);
+	CTraceWorkManager::instance()->receiveInfData(&dataInf);	
 	return ;
 }
 
 void CBugKiller::printfMemInfMap()
 {
+	char sTid[16];
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"printfMemInfMap");
-	dataInf.putInf(CBase::pthread_self());
-	dataInf.putInf(0);
+	dataInf.putInf(sTid);
+	dataInf.putInf("0");
 	dataInf.putInf("");
 	dataInf.putInf("");
-	dataInf.putInf(0);
+	dataInf.putInf("0");
 	dataInf.putInf("");
 
 	
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
 	CTraceWorkManager::instance()->send(packet, packetLen);
+	CTraceWorkManager::instance()->receiveInfData(&dataInf);
+	return ;	
 }
 
 void CBugKiller::openFile(const char *fileName)
 {
+	char sTid[16];
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"openFile");
-	dataInf.putInf(CBase::pthread_self());
-	dataInf.putInf(0);
+	dataInf.putInf(sTid);
+	dataInf.putInf("0");
 	dataInf.putInf("");
 	dataInf.putInf("");
-	dataInf.putInf(0);
+	dataInf.putInf("0");
 	dataInf.putInf(fileName);
 
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
 	CTraceWorkManager::instance()->send(packet, packetLen);
+	CTraceWorkManager::instance()->receiveInfData(&dataInf);
+	return ;	
 }
 
 
@@ -252,6 +293,50 @@ int CTraceWorkManager::reConnect()
 	printf("reConnect m_socketClient  %d\n", m_socketClient);
 	return m_socketClient;
 }
+
+bool CTraceWorkManager::receiveInfData(CLogDataInf *pDataInf)
+{
+	const int ClenSize = 4;
+	char CLen[ClenSize];
+	if (receive(CLen, ClenSize) <= 0)
+	{
+		return false;
+	}
+	int iLen = 0;		
+	pDataInf->C2ILen(CLen,ClenSize,iLen);
+
+	char *packet = new char[iLen];
+	memcpy(packet, CLen, ClenSize);
+	if (receive(packet+ClenSize, iLen-ClenSize) <= 0)
+	{
+		return false;
+	}
+	pDataInf->unPacket(packet);
+
+	return true;
+}
+
+int CTraceWorkManager::receive(char *szText,int iLen)
+{
+	int recvBufLen = 0;
+	int totalRecvLen = 0;
+	while (1)
+	{
+		recvBufLen = ::recv(m_socketClient, szText+totalRecvLen, iLen-totalRecvLen, 0);
+		if (recvBufLen <= 0)
+
+		{
+			return -1;
+		}
+		totalRecvLen += recvBufLen;
+		if (totalRecvLen == iLen)
+		{
+			break;
+		}
+	}
+	return iLen;
+}
+
 int CTraceWorkManager::send(char *szText,int len)
 {
 	int cnt;
@@ -539,45 +624,37 @@ void CLogDataInf::putInf(const char *strdata)
 	putInf((char *)strdata);
 }
 
-
-void CLogDataInf::putInf(int intData)
+int CLogDataInf::unPacket(char *packet)
 {
-	char strData[64];
-	CBase::snprintf(strData, sizeof(strData), "%d", intData);
-	putInf(strData);
+	m_packet = packet;
+	return unPacket(m_packet, m_infs, m_infLens);
 }
 
-int CLogDataInf::unPacket(char *infs[])
+int CLogDataInf::unPacket(char *packet, char *infs[], int infLens[])
 {
-	return unPacket(m_packet, infs);
-}
-int CLogDataInf::unPacket(char *packet, char *infs[])
-{
-	int totalLen = 0;
 	char *inf = NULL;
 	int infLen = 0;
-	
-	C2ILen(packet, m_lenSize, totalLen);
-
-	int infsNum = 0;
+	C2ILen(packet, m_lenSize, m_packetLen);
+	m_infsNum = 0;
 	int i=m_lenSize;
-	for (; i<totalLen-m_lenSize; )
+	for (; i<m_packetLen-m_lenSize; )
 	{
 		C2ILen(packet+i,m_lenSize,infLen);
 		inf = packet + i + m_lenSize;
 		i += infLen;
-
-		infs[infsNum++] = inf;
+		infs[m_infsNum] = inf;
+		infLens[m_infsNum++] = infLen;
+		
 	}
-	
 	C2ILen(packet+i,m_lenSize,infLen);
-	if (infLen != totalLen)
-	{
-		infs[0] = NULL;
-		return 0;
+	if (infLen != m_packetLen)
+	{	
+		m_packetLen = 0;
+		m_infsNum = 0;
 	}
-	infs[infsNum] = NULL;
-	return totalLen;
+	infs[m_infsNum] = NULL;
+	infLens[m_infsNum] = NULL;
+	return m_packetLen;
 }
 
 int CLogDataInf::packet(char *&packet)

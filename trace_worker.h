@@ -103,11 +103,35 @@ public:
 };
 
 
+class CLogDataInf
+{
+public:
+	CLogDataInf();
+	~CLogDataInf();
+	void putInf(char *strdata);
+	void putInf(const char *strdata);
+	int packet(char *&packet);
+	int unPacket(char *packet);
+	int unPacket(char *packet, char *infs[], int infLens[]);
+	void C2ILen(char *CLen, int CLenSize, int &iLen);
+private:
+	void I2CLen(int iLen, char *CLen, int CLenSize);
+private:
+	int m_lenSize;	
+	char *m_infs[INF_SIZE];
+	int m_infLens[INF_SIZE];
+	char *m_packet;
+	int m_packetLen;
+	int m_infsNum;
+};
+
 class CTraceWorkManager
 {
 public:
 	static CTraceWorkManager *instance();
 	bool startServer(const char *ip);
+	bool receiveInfData(CLogDataInf *pDataInf);
+	int receive(char *szText,int iLen);
 	int send(char *szText,int len);
 	void InsertHex(char *psBuf, int nBufLen, char *str, int strLen);
 	std::string &getBackTrace(std::string &backTrace);
@@ -124,27 +148,6 @@ private:
 };
 
 
-class CLogDataInf
-{
-public:
-	CLogDataInf();
-	~CLogDataInf();
-	void putInf(char *strdata);
-	void putInf(const char *strdata);
-	void putInf(int intData);
-	int packet(char *&packet);
-	int unPacket(char *infs[]);
-	int unPacket(char *packet, char *infs[]);
-private:
-	void I2CLen(int iLen, char *CLen, int CLenSize);
-	void C2ILen(char *CLen, int CLenSize, int &iLen);
-private:
-	int m_lenSize;	
-	char *m_infs[INF_SIZE];
-	char *m_packet;
-	int m_packetLen;
-	int m_infsNum;
-};
 
 
 

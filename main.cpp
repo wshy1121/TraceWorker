@@ -60,6 +60,8 @@ void* test1(void *pArg)
 int main()
 {
 	CBugKiller::startServer("127.0.0.1");
+	trace_worker();
+	return 0;
 	while (1)
 	{
 		{
