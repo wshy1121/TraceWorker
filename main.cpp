@@ -59,6 +59,24 @@ void* test1(void *pArg)
 
 int main()
 {
+	CBugKiller::startServer("127.0.0.1");
+	while (1)
+	{
+		{
+			trace_worker();
+			fun0(100);
+			CBase::usleep(100);
+		}
+		CTraceWorkManager::instance()->reConnect();
+	}
+	return 0;
+}
+
+
+
+
+int testThreads()
+{
 	char str[4096];
 	CTraceWorkManager::instance()->InsertHex(testData, sizeof(testData), str, sizeof(str));
 

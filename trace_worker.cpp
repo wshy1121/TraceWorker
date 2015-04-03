@@ -231,6 +231,8 @@ SOCKET CTraceWorkManager::connect(const char *sip, int port)
 	{
 		return -1;
 	}
+	m_sip = sip;
+	m_port = port;
 	return socketClient;
 }
 
@@ -239,6 +241,17 @@ int CTraceWorkManager::disConnect(SOCKET socket)
 	return CBase::close(socket);
 }
 
+int CTraceWorkManager::reConnect()
+{
+	if (m_socketClient > 0)
+	{
+		disConnect(m_socketClient);
+		m_socketClient = -1;
+	}
+	m_socketClient = connect(m_sip, m_port);
+	printf("reConnect m_socketClient  %d\n", m_socketClient);
+	return m_socketClient;
+}
 int CTraceWorkManager::send(char *szText,int len)
 {
 	int cnt;
