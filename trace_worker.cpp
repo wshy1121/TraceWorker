@@ -626,6 +626,10 @@ void CLogDataInf::putInf(const char *strdata)
 
 int CLogDataInf::unPacket(char *packet)
 {
+	if (m_packet && m_packet != packet)
+	{
+		free(m_packet);
+	}
 	m_packet = packet;
 	return unPacket(m_packet, m_infs, m_infLens);
 }

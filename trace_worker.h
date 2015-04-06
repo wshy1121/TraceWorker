@@ -116,7 +116,7 @@ public:
 	void C2ILen(char *CLen, int CLenSize, int &iLen);
 private:
 	void I2CLen(int iLen, char *CLen, int CLenSize);
-private:
+public:
 	int m_lenSize;	
 	char *m_infs[INF_SIZE];
 	int m_infLens[INF_SIZE];

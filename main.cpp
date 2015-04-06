@@ -60,14 +60,16 @@ void* test1(void *pArg)
 int main()
 {
 	CBugKiller::startServer("127.0.0.1");
-	trace_worker();
-	return 0;
+	{
+		trace_worker();
+	}
+
 	while (1)
 	{
 		{
 			trace_worker();
-			fun0(100);
-			CBase::usleep(100);
+			fun0(5);
+			//CBase::usleep(100);
 		}
 		CTraceWorkManager::instance()->reConnect();
 	}
