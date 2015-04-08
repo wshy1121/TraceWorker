@@ -14,3 +14,7 @@ LogClient.SearchResults
 /Build/LogClient/LogClient.opensdf
 /Build/LogClient/LogClient.sdf
 /*.WK3
+*.SearchResults
+
+*.tlog
+Release

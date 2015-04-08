@@ -320,6 +320,9 @@ int CTraceWorkManager::reConnect()
 
 int CTraceWorkManager::getSessionId()
 {
+#ifndef _DEBUG
+	return 0;
+#endif
 	if (m_sessionId > m_maxSessionId)
 	{
 		m_sessionId = 0;
@@ -330,6 +333,12 @@ int CTraceWorkManager::getSessionId()
 
 bool CTraceWorkManager::receiveInfData(CLogDataInf *pDataInf)
 {
+	int sessionId = atoi(pDataInf->m_infs[1]);
+	if (sessionId <= 0)
+	{
+		return true;
+	}
+	
 	const int ClenSize = 4;
 	char CLen[ClenSize];
 	if (receive(CLen, ClenSize) <= 0)
@@ -651,6 +660,8 @@ void CLogDataInf::putInf(char *strdata)
 	memcpy(m_packet+m_packetLen, strdata, dataLen);
 	m_packetLen += dataLen;
 
+	m_infs[m_infsNum] = strdata;
+	m_infLens[m_infsNum++] = dataLen;	
 }
 
 void CLogDataInf::putInf(const char *strdata)
