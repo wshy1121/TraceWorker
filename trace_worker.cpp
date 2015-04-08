@@ -15,15 +15,18 @@ typedef int SOCKET;
 
 CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 {
+	char sSid[16];
 	char sTid[16];
 	char sLine[8];
 	char sLevel[8];
+	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 	CBase::snprintf(sLevel, sizeof(sLevel), "%d", display_level);
 	
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"createCandy");
+	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
 	dataInf.putInf(sLine);
 	dataInf.putInf(file_name);
@@ -41,10 +44,13 @@ CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 
 CCandy::~CCandy()
 {
-	char sTid[16];
+	char sSid[16];
+	char sTid[16];	
+	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"destroyCandy");
+	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
 	dataInf.putInf("0");
 	dataInf.putInf("");
@@ -69,13 +75,16 @@ void CBugKiller::InsertTrace(int line, char *file_name, const char* fmt, ...)
 	CBase::vsnprintf(content,sizeof(content), fmt, ap);
 	va_end(ap);
 
+	char sSid[16];
 	char sTid[16];
-	char sLine[8];
+	char sLine[8];	
+	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 	
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"insertTrace");
+	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
 	dataInf.putInf(sLine);
 	dataInf.putInf(file_name);
@@ -95,13 +104,16 @@ void CBugKiller::InsertHex(int line, char *file_name, char *psBuf, int nBufLen)
 	char str[4096];
 	g_trace->InsertHex(psBuf, nBufLen, str, sizeof(str));
 
+	char sSid[16];
 	char sTid[16];
-	char sLine[8];
+	char sLine[8];	
+	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"insertTrace");
+	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
 	dataInf.putInf(sLine);
 	dataInf.putInf(file_name);
@@ -118,10 +130,13 @@ void CBugKiller::InsertHex(int line, char *file_name, char *psBuf, int nBufLen)
 
 void CBugKiller::DispAll()
 {
-	char sTid[16];
+	char sSid[16];
+	char sTid[16];	
+	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"dispAll");
+	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
 	dataInf.putInf("0");
 	dataInf.putInf("");
@@ -145,13 +160,16 @@ void CBugKiller::InsertTag(int line, char *file_name, const char* fmt, ...)
 	CBase::vsnprintf(content,sizeof(content), fmt, ap);
 	va_end(ap);
 
+	char sSid[16];
 	char sTid[16];
-	char sLine[8];
+	char sLine[8];	
+	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"insertTag");
+	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
 	dataInf.putInf(sLine);
 	dataInf.putInf(file_name);
@@ -168,10 +186,13 @@ void CBugKiller::InsertTag(int line, char *file_name, const char* fmt, ...)
 
 void CBugKiller::printfMemInfMap()
 {
-	char sTid[16];
+	char sSid[16];
+	char sTid[16];	
+	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"printfMemInfMap");
+	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
 	dataInf.putInf("0");
 	dataInf.putInf("");
@@ -189,10 +210,13 @@ void CBugKiller::printfMemInfMap()
 
 void CBugKiller::openFile(const char *fileName)
 {
+	char sSid[16];
 	char sTid[16];
+	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"openFile");
+	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
 	dataInf.putInf("0");
 	dataInf.putInf("");
@@ -228,7 +252,7 @@ bool CBugKiller::startServer(const char *sip)
 }
 
 
-CTraceWorkManager::CTraceWorkManager()
+CTraceWorkManager::CTraceWorkManager():m_sessionId(1), m_maxSessionId(1024*1024)
 {
 #ifdef WIN32	
 		WSADATA wsa={0};
@@ -292,6 +316,16 @@ int CTraceWorkManager::reConnect()
 	m_socketClient = connect(m_sip, m_port);
 	printf("reConnect m_socketClient  %d\n", m_socketClient);
 	return m_socketClient;
+}
+
+int CTraceWorkManager::getSessionId()
+{
+	if (m_sessionId > m_maxSessionId)
+	{
+		m_sessionId = 0;
+		
+	}
+	return ++m_sessionId;
 }
 
 bool CTraceWorkManager::receiveInfData(CLogDataInf *pDataInf)

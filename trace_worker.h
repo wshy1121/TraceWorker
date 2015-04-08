@@ -136,6 +136,7 @@ public:
 	void InsertHex(char *psBuf, int nBufLen, char *str, int strLen);
 	std::string &getBackTrace(std::string &backTrace);
 	int reConnect();
+	int getSessionId();	
 private:
 	CTraceWorkManager();	
 	SOCKET connect(const char *sip, int port);
@@ -145,6 +146,8 @@ private:
 	int m_port;
 	SOCKET m_socketClient;
 	CBase::pthread_mutex_t socketMutex;
+	int m_sessionId;
+	const int m_maxSessionId;
 };
 
 #define g_trace CTraceWorkManager::instance()
