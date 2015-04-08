@@ -147,6 +147,7 @@ private:
 	CBase::pthread_mutex_t socketMutex;
 };
 
+#define g_trace CTraceWorkManager::instance()
 
 
 

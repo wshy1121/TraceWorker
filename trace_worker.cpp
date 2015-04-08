@@ -33,9 +33,9 @@ CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 	
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
-	CTraceWorkManager::instance()->send(packet, packetLen);
+	g_trace->send(packet, packetLen);
 	
-	CTraceWorkManager::instance()->receiveInfData(&dataInf);
+	g_trace->receiveInfData(&dataInf);
 	return ;
 }
 
@@ -54,8 +54,8 @@ CCandy::~CCandy()
 	
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
-	CTraceWorkManager::instance()->send(packet, packetLen);
-	CTraceWorkManager::instance()->receiveInfData(&dataInf);
+	g_trace->send(packet, packetLen);
+	g_trace->receiveInfData(&dataInf);
 	return ;
 }
 
@@ -85,15 +85,15 @@ void CBugKiller::InsertTrace(int line, char *file_name, const char* fmt, ...)
 	
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
-	CTraceWorkManager::instance()->send(packet, packetLen);
-	CTraceWorkManager::instance()->receiveInfData(&dataInf);
+	g_trace->send(packet, packetLen);
+	g_trace->receiveInfData(&dataInf);
 	return ;
 }
 
 void CBugKiller::InsertHex(int line, char *file_name, char *psBuf, int nBufLen)
 {
 	char str[4096];
-	CTraceWorkManager::instance()->InsertHex(psBuf, nBufLen, str, sizeof(str));
+	g_trace->InsertHex(psBuf, nBufLen, str, sizeof(str));
 
 	char sTid[16];
 	char sLine[8];
@@ -111,8 +111,8 @@ void CBugKiller::InsertHex(int line, char *file_name, char *psBuf, int nBufLen)
 
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
-	CTraceWorkManager::instance()->send(packet, packetLen);
-	CTraceWorkManager::instance()->receiveInfData(&dataInf);	
+	g_trace->send(packet, packetLen);
+	g_trace->receiveInfData(&dataInf);	
 	return ;
 }
 
@@ -131,8 +131,8 @@ void CBugKiller::DispAll()
 
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
-	CTraceWorkManager::instance()->send(packet, packetLen);
-	CTraceWorkManager::instance()->receiveInfData(&dataInf);
+	g_trace->send(packet, packetLen);
+	g_trace->receiveInfData(&dataInf);
 	return ;	
 }
 
@@ -161,8 +161,8 @@ void CBugKiller::InsertTag(int line, char *file_name, const char* fmt, ...)
 
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
-	CTraceWorkManager::instance()->send(packet, packetLen);
-	CTraceWorkManager::instance()->receiveInfData(&dataInf);	
+	g_trace->send(packet, packetLen);
+	g_trace->receiveInfData(&dataInf);	
 	return ;
 }
 
@@ -182,8 +182,8 @@ void CBugKiller::printfMemInfMap()
 	
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
-	CTraceWorkManager::instance()->send(packet, packetLen);
-	CTraceWorkManager::instance()->receiveInfData(&dataInf);
+	g_trace->send(packet, packetLen);
+	g_trace->receiveInfData(&dataInf);
 	return ;	
 }
 
@@ -202,8 +202,8 @@ void CBugKiller::openFile(const char *fileName)
 
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
-	CTraceWorkManager::instance()->send(packet, packetLen);
-	CTraceWorkManager::instance()->receiveInfData(&dataInf);
+	g_trace->send(packet, packetLen);
+	g_trace->receiveInfData(&dataInf);
 	return ;	
 }
 
@@ -211,13 +211,13 @@ void CBugKiller::openFile(const char *fileName)
 void CBugKiller::printfStackInfo(int line, char *file_name)
 {
 	std::string backTrace;
-	CTraceWorkManager::instance()->getBackTrace(backTrace);
+	g_trace->getBackTrace(backTrace);
 	InsertTrace(line, file_name, backTrace.c_str());
 }
 
 bool CBugKiller::startServer(const char *sip)
 {
-	bool bRet = CTraceWorkManager::instance()->startServer(sip);
+	bool bRet = g_trace->startServer(sip);
 	if (!bRet)
 	{
 		return bRet;

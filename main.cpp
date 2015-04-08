@@ -71,7 +71,7 @@ int main()
 			fun0(5);
 			//CBase::usleep(100);
 		}
-		CTraceWorkManager::instance()->reConnect();
+		g_trace->reConnect();
 	}
 	return 0;
 }
@@ -82,7 +82,7 @@ int main()
 int testThreads()
 {
 	char str[4096];
-	CTraceWorkManager::instance()->InsertHex(testData, sizeof(testData), str, sizeof(str));
+	g_trace->InsertHex(testData, sizeof(testData), str, sizeof(str));
 
 	int dataLen = sizeof(testData);
 	memset(testData, 'A', dataLen);
