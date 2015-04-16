@@ -41,7 +41,7 @@ private:
 };
 
 
-#ifndef _DEBUG
+#if !defined(_DEBUG)
 #define NO_CTIME_CALC
 #endif
 #if !defined(NO_CTIME_CALC)

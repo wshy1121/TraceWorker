@@ -397,7 +397,7 @@ int CTraceWorkManager::reConnect()
 
 int CTraceWorkManager::getSessionId()
 {
-#ifndef _DEBUG
+#if !defined(_DEBUG)
 	return 0;
 #endif
 	if (m_sessionId > m_maxSessionId)
