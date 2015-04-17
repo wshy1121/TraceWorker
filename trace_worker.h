@@ -56,7 +56,7 @@ private:
 #define trace_err(num)       trace_printf("ERRERRERRERRERRERRERR:%d    %d    %s", (num), __LINE__, __FILE__)
 #define trace_unworker()  trace_level(0)
 #define trace_worker()   trace_level(100)
-
+#define trace_start(sip)  CBugKiller::startServer(sip)
 #else
 #define trace_level(level)    
 #define trace_printf(format, ...)      
@@ -69,6 +69,8 @@ private:
 #define trace_err(num)        
 #define trace_unworker()    
 #define trace_worker()   
+#define trace_start(sip)  
+
 #endif
 
 
