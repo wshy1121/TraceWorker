@@ -67,7 +67,7 @@ class CTraceWorkManager
 {
 public:
 	static CTraceWorkManager *instance();
-	bool startServer(const char *ip);
+	bool startServer(const char *sip, int sport);
 	bool receiveInfData(CLogDataInf *pDataInf);
 	int receive(char *szText,int iLen);
 	int send(char *szText,int len);
