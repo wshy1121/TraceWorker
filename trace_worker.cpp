@@ -345,8 +345,9 @@ CTraceWorkManager *CTraceWorkManager::instance()
 
 bool CTraceWorkManager::startServer(const char *sip)
 {
+	int serverPort = 880110;
 	CBase::pthread_mutex_init(&socketMutex, NULL);
-	m_socketClient = connect(sip, 8889);
+	m_socketClient = connect(sip, serverPort);
 	if(-1 == m_socketClient)
 	{
 		return false;
