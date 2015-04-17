@@ -328,6 +328,10 @@ bool CBugKiller::startServer(const char *sip)
 	return bRet;
 }
 
+int CBugKiller::reStart()
+{
+	return CTraceWorkManager::instance()->reConnect();
+}
 
 CTraceWorkManager::CTraceWorkManager():m_sessionId(1), m_maxSessionId(1024*1024)
 {

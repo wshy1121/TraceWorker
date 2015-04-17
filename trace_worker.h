@@ -36,6 +36,7 @@ public:
 	static void openFile(const char *fileName);
 	static void printfStackInfo(int line, char *file_name);
 	static bool startServer(const char *ip);
+	static int reStart();
 private:
 	CBugKiller();
 };
