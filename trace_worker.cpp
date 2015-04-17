@@ -316,9 +316,9 @@ void CBugKiller::printfStackInfo(int line, char *file_name)
 	InsertTrace(line, file_name, backTrace.c_str());
 }
 
-bool CBugKiller::startServer(const char *sip)
+bool CBugKiller::startServer(const char *sip, int sport)
 {
-	bool bRet = g_trace->startServer(sip);
+	bool bRet = g_trace->startServer(sip, sport);
 	if (!bRet)
 	{
 		return bRet;
@@ -347,9 +347,9 @@ CTraceWorkManager *CTraceWorkManager::instance()
 	return &_instance;
 }
 
-bool CTraceWorkManager::startServer(const char *sip)
+bool CTraceWorkManager::startServer(const char *sip, int sport)
 {
-	int serverPort = 880110;
+	int serverPort = sport;
 	CBase::pthread_mutex_init(&socketMutex, NULL);
 	m_socketClient = connect(sip, serverPort);
 	if(-1 == m_socketClient)
