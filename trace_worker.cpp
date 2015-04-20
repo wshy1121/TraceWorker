@@ -393,7 +393,11 @@ int CTraceWorkManager::reConnect()
 	}
 	m_socketClient = connect(m_sip, m_port);
 	printf("reConnect m_socketClient  %d\n", m_socketClient);
-	return m_socketClient;
+	if (m_socketClient <= 0)
+	{
+		return -1;
+	}
+	return 0;
 }
 
 int CTraceWorkManager::reStart()
