@@ -67,21 +67,24 @@ class CTraceWorkManager
 {
 public:
 	static CTraceWorkManager *instance();
-	bool startServer(const char *sip, int sport);
+	bool startServer(const char *sip, int sport, const char *fileName);
 	bool receiveInfData(CLogDataInf *pDataInf);
 	int receive(char *szText,int iLen);
 	int send(char *szText,int len);
 	void InsertHex(char *psBuf, int nBufLen, char *str, int strLen);
 	std::string &getBackTrace(std::string &backTrace);
-	int reConnect();
+	int reStart();
 	int getSessionId();	
 private:
 	CTraceWorkManager();	
+	void openFile(const char *fileName);
 	SOCKET connect(const char *sip, int port);
-	int disConnect(SOCKET socket);
+	int disConnect(SOCKET socket);	
+	int reConnect();
 private:	
 	const char *m_sip;
 	int m_port;
+	std::string m_fileName;
 	SOCKET m_socketClient;
 	CBase::pthread_mutex_t socketMutex;
 	int m_sessionId;
@@ -285,7 +288,50 @@ void CBugKiller::printfMemInfMap()
 	return ;	
 }
 
-void CBugKiller::openFile(const char *fileName)
+void CBugKiller::printfStackInfo(int line, char *file_name)
+{
+	std::string backTrace;
+	g_trace->getBackTrace(backTrace);
+	InsertTrace(line, file_name, backTrace.c_str());
+}
+
+bool CBugKiller::startServer(const char *sip, int sport, const char *fileName)
+{
+	return g_trace->startServer(sip, sport, fileName);
+}
+
+int CBugKiller::reStart()
+{
+	return CTraceWorkManager::instance()->reStart();
+}
+
+CTraceWorkManager::CTraceWorkManager():m_sessionId(1), m_maxSessionId(1024*1024)
+{
+#ifdef WIN32	
+		WSADATA wsa={0};
+		WSAStartup(MAKEWORD(2,2),&wsa);
+#endif
+}
+
+CTraceWorkManager *CTraceWorkManager::instance()
+{
+	static CTraceWorkManager _instance;
+	return &_instance;
+}
+
+bool CTraceWorkManager::startServer(const char *sip, int sport, const char *fileName)
+{
+	int serverPort = sport;
+	CBase::pthread_mutex_init(&socketMutex, NULL);
+	m_socketClient = connect(sip, serverPort);
+	if(-1 == m_socketClient)
+	{
+		return false;
+	}
+	openFile(fileName);
+	return true;
+}
+void CTraceWorkManager::openFile(const char *fileName)
 {
 	char sSid[16];
 	char sTid[16];
@@ -303,61 +349,11 @@ void CBugKiller::openFile(const char *fileName)
 
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
-	g_trace->send(packet, packetLen);
-	g_trace->receiveInfData(&dataInf);
+	send(packet, packetLen);
+	receiveInfData(&dataInf);
+
+	m_fileName = fileName;
 	return ;	
-}
-
-
-void CBugKiller::printfStackInfo(int line, char *file_name)
-{
-	std::string backTrace;
-	g_trace->getBackTrace(backTrace);
-	InsertTrace(line, file_name, backTrace.c_str());
-}
-
-bool CBugKiller::startServer(const char *sip, int sport)
-{
-	bool bRet = g_trace->startServer(sip, sport);
-	if (!bRet)
-	{
-		return bRet;
-	}
-
-	openFile("Debug11.cpp");
-	return bRet;
-}
-
-int CBugKiller::reStart()
-{
-	return CTraceWorkManager::instance()->reConnect();
-}
-
-CTraceWorkManager::CTraceWorkManager():m_sessionId(1), m_maxSessionId(1024*1024)
-{
-#ifdef WIN32	
-		WSADATA wsa={0};
-		WSAStartup(MAKEWORD(2,2),&wsa);
-#endif
-}
-
-CTraceWorkManager *CTraceWorkManager::instance()
-{
-	static CTraceWorkManager _instance;
-	return &_instance;
-}
-
-bool CTraceWorkManager::startServer(const char *sip, int sport)
-{
-	int serverPort = sport;
-	CBase::pthread_mutex_init(&socketMutex, NULL);
-	m_socketClient = connect(sip, serverPort);
-	if(-1 == m_socketClient)
-	{
-		return false;
-	}
-
-	return true;
 }
 
 SOCKET CTraceWorkManager::connect(const char *sip, int port)
@@ -398,6 +394,18 @@ int CTraceWorkManager::reConnect()
 	m_socketClient = connect(m_sip, m_port);
 	printf("reConnect m_socketClient  %d\n", m_socketClient);
 	return m_socketClient;
+}
+
+int CTraceWorkManager::reStart()
+{
+	int iRet = 0;
+	iRet = reConnect();
+	if (iRet != 0)
+	{
+		return iRet;
+	}
+	openFile(m_fileName.c_str());
+	return 0;
 }
 
 int CTraceWorkManager::getSessionId()

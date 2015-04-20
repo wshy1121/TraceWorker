@@ -33,9 +33,8 @@ public:
 	static void DispAll();
 	static void InsertTag(int line, char *file_name, const char* fmt, ...);
 	static void printfMemInfMap();
-	static void openFile(const char *fileName);
 	static void printfStackInfo(int line, char *file_name);
-	static bool startServer(const char *sip, int sport);
+	static bool startServer(const char *sip, int sport, const char *fileName = "Debug.cpp");
 	static int reStart();
 private:
 	CBugKiller();
@@ -57,7 +56,7 @@ private:
 #define trace_err(num)       trace_printf("ERRERRERRERRERRERRERR:%d    %d    %s", (num), __LINE__, __FILE__)
 #define trace_unworker()  trace_level(0)
 #define trace_worker()   trace_level(100)
-#define trace_start(sip, sport)  CBugKiller::startServer(sip, sport)
+#define trace_start(sip, sport, fileName)  CBugKiller::startServer(sip, sport, fileName)
 #else
 #define trace_level(level)    
 #define trace_printf(format, ...)      
