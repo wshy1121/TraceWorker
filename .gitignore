@@ -21,3 +21,5 @@ Release
 *.sdf
 /TraceWorker/Debug
 *.opensdf
+*.ipch
+
