@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{12F04B78-72C1-420E-B0C9-8D683C35B060}</ProjectGuid>
+    <ProjectGuid>{013819B8-9C4E-40BB-BE8D-F8AD5C67F3A2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>TraceWorker</RootNamespace>
   </PropertyGroup>
