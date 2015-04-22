@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #ifdef WIN32
 #include <windows.h>
 #pragma comment(lib,"ws2_32.lib")
