@@ -452,6 +452,11 @@ bool CTraceWorkManager::receiveInfData(CLogDataInf *pDataInf)
 
 int CTraceWorkManager::receive(char *szText,int iLen)
 {
+	if(-1 == m_socketClient)
+	{
+		return -1;
+	}
+
 	int recvBufLen = 0;
 	int totalRecvLen = 0;
 	while (1)
@@ -473,6 +478,11 @@ int CTraceWorkManager::receive(char *szText,int iLen)
 
 int CTraceWorkManager::send(char *szText,int len)
 {
+	if(-1 == m_socketClient)
+	{
+		return -1;
+	}
+
 	int cnt;
 	int rc;
 	cnt=len;
