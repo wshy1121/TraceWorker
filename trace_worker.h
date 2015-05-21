@@ -88,7 +88,7 @@ private:
 #define trace_num(num)	   
 #define trace_err(num)        
 #define trace_unworker()    
-#define trace_worker()   1
+#define trace_worker()   
 #define trace_start(sip, sport, fileName)  
 
 #endif
