@@ -64,10 +64,6 @@ private:
 	CBugKiller();
 };
 
-
-#if !defined(_DEBUG)
-#define NO_CTIME_CALC
-#endif
 #if !defined(NO_CTIME_CALC)
 #define trace_level(level)  CCandy candy(__LINE__, (char *)__FILE__, (char *)__FUNCTION__, level)
 #define trace_printf(format, ...)    CBugKiller::InsertTrace(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
