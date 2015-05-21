@@ -11,7 +11,6 @@ typedef int SOCKET;
 #endif
 #include "trace_worker.h"
 
-#define INF_SIZE 16 
 class CBase
 {
 public:
@@ -38,28 +37,6 @@ public:
 	static int pthread_mutex_unlock(pthread_mutex_t *mutex);
 	static int backtrace(void **buffer, int size);
 	static int close(int fd);
-};
-
-class CLogDataInf
-{
-public:
-	CLogDataInf();
-	~CLogDataInf();
-	void putInf(char *strdata);
-	void putInf(const char *strdata);
-	int packet(char *&packet);
-	int unPacket(char *packet);
-	int unPacket(char *packet, char *infs[], int infLens[]);
-	void C2ILen(char *CLen, int CLenSize, int &iLen);
-private:
-	void I2CLen(int iLen, char *CLen, int CLenSize);
-public:
-	int m_lenSize;	
-	char *m_infs[INF_SIZE];
-	int m_infLens[INF_SIZE];
-	char *m_packet;
-	int m_packetLen;
-	int m_infsNum;
 };
 
 class CTraceWorkManager
@@ -337,7 +314,7 @@ void CTraceWorkManager::openFile(const char *fileName)
 	dataInf.putInf("");
 	dataInf.putInf("");
 	dataInf.putInf("0");
-	dataInf.putInf(fileName);
+	dataInf.putInf((char *)fileName);
 
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
@@ -705,10 +682,11 @@ int CBase::close(int fd)
 #endif
 }
 
-CLogDataInf::CLogDataInf() : m_lenSize(4), m_packet(NULL),m_infsNum(0)
+
+int CLogDataInf::m_lenSize = 4;
+
+CLogDataInf::CLogDataInf() : m_packet(NULL), m_packetLen(0), m_infsNum(0)
 {
-	m_packet = (char *)malloc(32*1024);
-	m_packetLen = m_lenSize;
 }
 
 
@@ -751,29 +729,57 @@ void CLogDataInf::C2ILen(char *CLen, int CLenSize, int &iLen)
 
 void CLogDataInf::putInf(char *strdata)
 {
-	int dataLen = strlen(strdata) + 1;
-
-	I2CLen(dataLen + m_lenSize, m_packet+m_packetLen, m_lenSize);
-	m_packetLen += m_lenSize;
-
-	memcpy(m_packet+m_packetLen, strdata, dataLen);
-	m_packetLen += dataLen;
-
-	m_infs[m_infsNum] = strdata;
-	m_infLens[m_infsNum++] = dataLen;	
+	putInf(strdata, strlen(strdata) + 1);
 }
 
-void CLogDataInf::putInf(const char *strdata)
+void CLogDataInf::putInf(char *hexData, int dataLen)
 {
-	putInf((char *)strdata);
+	if (m_infsNum >= INF_SIZE)
+	{
+		return ;
+	}
+	m_infs[m_infsNum] = hexData;
+	m_infLens[m_infsNum++] = dataLen;
+	m_packetLen += dataLen + m_lenSize;	
+}
+int CLogDataInf::packet()
+{
+	return packet(m_packet);
 }
 
+int CLogDataInf::packet(char *&packet)
+{
+	char *tmpPacket = m_packet;
+	int mallocLen = m_lenSize + m_packetLen + m_lenSize;
+	m_packet = (char *)malloc(mallocLen);
+
+	int pos = 0;
+	I2CLen(mallocLen, m_packet+pos, m_lenSize);
+	pos += m_lenSize;
+
+	char *inf = NULL;
+	int infLen = 0;
+	for (int i=0; i<m_infsNum; ++i)
+	{
+		inf = m_infs[i];
+		infLen = m_infLens[i];
+		I2CLen(infLen + m_lenSize, m_packet+pos, m_lenSize);
+		pos += m_lenSize;
+		memcpy(m_packet+pos, inf, infLen);
+		inf = m_packet+pos;
+		pos += infLen;
+	}
+	I2CLen(mallocLen, m_packet+pos, m_lenSize);
+
+	packet = m_packet;
+	if (tmpPacket)
+	{
+		free(tmpPacket);
+	}	
+	return mallocLen;
+}
 int CLogDataInf::unPacket(char *packet)
 {
-	if (m_packet && m_packet != packet)
-	{
-		free(m_packet);
-	}
 	m_packet = packet;
 	return unPacket(m_packet, m_infs, m_infLens);
 }
@@ -791,7 +797,7 @@ int CLogDataInf::unPacket(char *packet, char *infs[], int infLens[])
 		inf = packet + i + m_lenSize;
 		i += infLen;
 		infs[m_infsNum] = inf;
-		infLens[m_infsNum++] = infLen;
+		infLens[m_infsNum++] = infLen - m_lenSize;
 		
 	}
 	C2ILen(packet+i,m_lenSize,infLen);
@@ -805,15 +811,14 @@ int CLogDataInf::unPacket(char *packet, char *infs[], int infLens[])
 	return m_packetLen;
 }
 
-int CLogDataInf::packet(char *&packet)
+int CLogDataInf::getPacket(char *&packet)
 {
-	m_packetLen += m_lenSize;
-
-	I2CLen(m_packetLen, m_packet, m_lenSize);
-	I2CLen(m_packetLen, m_packet+m_packetLen-m_lenSize, m_lenSize);
-	
+	if (m_packet == NULL)
+	{
+		CLogDataInf::packet();
+	}
 	packet = m_packet;
-	return m_packetLen;
+	return m_lenSize + m_packetLen + m_lenSize;
 }
 
 
