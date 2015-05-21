@@ -64,7 +64,7 @@ private:
 	CBugKiller();
 };
 
-#if defined(_DEBUG)
+#if !defined(NO_CTIME_CALC)
 #define trace_level(level)  CCandy candy(__LINE__, (char *)__FILE__, (char *)__FUNCTION__, level)
 #define trace_printf(format, ...)    CBugKiller::InsertTrace(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
 #define trace_all()    CBugKiller::DispAll()
@@ -88,7 +88,7 @@ private:
 #define trace_num(num)	   
 #define trace_err(num)        
 #define trace_unworker()    
-#define trace_worker()   
+#define trace_worker()   1
 #define trace_start(sip, sport, fileName)  
 
 #endif
