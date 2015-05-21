@@ -508,7 +508,7 @@ void CTraceWorkManager::InsertHex(char *psBuf, int nBufLen, char *str, int strLe
 		memcpy( &sLine[j*3+5+(j>7)], sTemp, 3);
 
 		/* output psBuf in ascii */
-		if ( isprint (psBuf[i]))
+		if ( isprint ((unsigned char)psBuf[i]))
 		{
 			sLine[j+55+(j>7)]=psBuf[i];
 		}
