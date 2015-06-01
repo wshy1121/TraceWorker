@@ -24,3 +24,5 @@ Release
 *.ipch
 
 /TraceWorker/ipch
+*.d
+*.o

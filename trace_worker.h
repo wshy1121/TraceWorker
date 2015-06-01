@@ -23,6 +23,7 @@ class CLogDataInf
 public:
 	CLogDataInf();
 	~CLogDataInf();
+	void putInf(const char *strdata);
 	void putInf(char *strdata);	
 	void putInf(char *hexData, int dataLen);
 	int packet();

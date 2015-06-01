@@ -726,6 +726,10 @@ void CLogDataInf::C2ILen(char *CLen, int CLenSize, int &iLen)
 }
 
 
+void CLogDataInf::putInf(const char *strdata)
+{
+	putInf((char *)strdata);
+}
 
 void CLogDataInf::putInf(char *strdata)
 {
