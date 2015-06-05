@@ -49,8 +49,9 @@ public:
 	std::string &getBackTrace(std::string &backTrace);
 	int reStart();
 	int getSessionId();	
+	static void ctrl_c_func(int signo);
 private:
-	CTraceWorkManager();	
+	CTraceWorkManager(); 
 	void openFile(const char *fileName);
 	SOCKET connect(const char *sip, int port);
 	int disConnect(SOCKET socket);	
@@ -264,6 +265,20 @@ void CBugKiller::printfStackInfo(int line, char *file_name)
 	InsertTrace(line, file_name, backTrace.c_str());
 }
 
+
+
+void CBugKiller::traceSignal(int signo)
+{
+	struct sigaction act;
+
+	act.sa_handler = CTraceWorkManager::ctrl_c_func;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = 0;
+
+	sigaction(signo, &act, NULL);	
+}
+
+
 bool CBugKiller::startServer(const char *sip, int sport, const char *fileName)
 {
 	return g_trace->startServer(sip, sport, fileName);
@@ -300,6 +315,14 @@ bool CTraceWorkManager::startServer(const char *sip, int sport, const char *file
 	openFile(fileName);
 	return true;
 }
+
+void CTraceWorkManager::ctrl_c_func(int signo)
+{
+	CBugKiller::InsertTrace(__LINE__, __FILE__, "signal  %d", signo);
+	CBugKiller::printfStackInfo(__LINE__, __FILE__);
+	exit(0);
+}
+
 void CTraceWorkManager::openFile(const char *fileName)
 {
 	char sSid[16];

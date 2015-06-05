@@ -8,6 +8,7 @@
 #include <execinfo.h>
 #include <stdarg.h>
 #include <pthread.h>
+#include <signal.h>
 typedef int SOCKET;
 #endif
 
@@ -61,6 +62,7 @@ public:
 	static void printfStackInfo(int line, char *file_name);
 	static bool startServer(const char *sip, int sport, const char *fileName = "Debug.cpp");
 	static int reStart();
+	static void traceSignal(int signo);
 private:
 	CBugKiller();
 };
@@ -78,6 +80,7 @@ private:
 #define trace_unworker()  trace_level(0)
 #define trace_worker()   trace_level(100)
 #define trace_start(sip, sport, fileName)  CBugKiller::startServer(sip, sport, fileName)
+#define trace_signal(signo)  CBugKiller::traceSignal(signo)
 #else
 #define trace_level(level)    
 #define trace_printf(format, ...)      
@@ -91,6 +94,7 @@ private:
 #define trace_unworker()    
 #define trace_worker()   
 #define trace_start(sip, sport, fileName)  
+#define trace_signal(signo)  
 
 #endif
 
