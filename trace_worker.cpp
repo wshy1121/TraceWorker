@@ -78,7 +78,7 @@ CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 	char sLine[8];
 	char sLevel[8];
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
-	CBase::snprintf(sTid, sizeof(sTid), "%ld", CBase::pthread_self());
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 	CBase::snprintf(sLevel, sizeof(sLevel), "%d", display_level);
 	
@@ -103,7 +103,7 @@ CCandy::~CCandy()
 	char sSid[16];
 	char sTid[16];	
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
-	CBase::snprintf(sTid, sizeof(sTid), "%ld", CBase::pthread_self());
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"destroyCandy");
 	dataInf.putInf(sSid);
@@ -134,7 +134,7 @@ void CBugKiller::InsertTrace(int line, char *file_name, const char* fmt, ...)
 	char sTid[16];
 	char sLine[8];	
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
-	CBase::snprintf(sTid, sizeof(sTid), "%ld", CBase::pthread_self());
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 	
 	CLogDataInf dataInf;
@@ -162,7 +162,7 @@ void CBugKiller::InsertHex(int line, char *file_name, char *psBuf, int nBufLen)
 	char sTid[16];
 	char sLine[8];	
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
-	CBase::snprintf(sTid, sizeof(sTid), "%ld", CBase::pthread_self());
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 
 	CLogDataInf dataInf;
@@ -186,7 +186,7 @@ void CBugKiller::DispAll()
 	char sSid[16];
 	char sTid[16];	
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
-	CBase::snprintf(sTid, sizeof(sTid), "%ld", CBase::pthread_self());
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"dispAll");
 	dataInf.putInf(sSid);
@@ -216,7 +216,7 @@ void CBugKiller::InsertTag(int line, char *file_name, const char* fmt, ...)
 	char sTid[16];
 	char sLine[8];	
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
-	CBase::snprintf(sTid, sizeof(sTid), "%ld", CBase::pthread_self());
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 
 	CLogDataInf dataInf;
@@ -240,7 +240,7 @@ void CBugKiller::printfMemInfMap()
 	char sSid[16];
 	char sTid[16];	
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
-	CBase::snprintf(sTid, sizeof(sTid), "%ld", CBase::pthread_self());
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"printfMemInfMap");
 	dataInf.putInf(sSid);
@@ -318,8 +318,8 @@ bool CTraceWorkManager::startServer(const char *sip, int sport, const char *file
 
 void CTraceWorkManager::ctrl_c_func(int signo)
 {
-	CBugKiller::InsertTrace(__LINE__, __FILE__, "signal  %d", signo);
-	CBugKiller::printfStackInfo(__LINE__, __FILE__);
+	CBugKiller::InsertTrace(__LINE__, (char *)__FILE__, "signal  %d", signo);
+	CBugKiller::printfStackInfo(__LINE__, (char *)__FILE__);
 	exit(0);
 }
 
@@ -328,7 +328,7 @@ void CTraceWorkManager::openFile(const char *fileName)
 	char sSid[16];
 	char sTid[16];
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
-	CBase::snprintf(sTid, sizeof(sTid), "%ld", CBase::pthread_self());
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"openFile");
 	dataInf.putInf(sSid);
