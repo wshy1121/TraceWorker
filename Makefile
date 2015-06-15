@@ -1,13 +1,16 @@
+############################################################################
+#
+# Makefile for DH-DVR_ARM2510
+#
+# arm-uclinux-elf-gcc version 3.4.3
+#
+############################################################################
 #CROSS  = sh4-linux-uclibc-
 #CROSS  = arm-none-linux-gnueabi-
 #CROSS  = arm-linux-gnueabihf-
+LIB_OBJS += trace_worker.o 
 
-
-LIB_SRC += main.cpp 
-LIB_SRC += trace_worker.cpp 
-
-CFLAGS += -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -lc -static
-
+CXXFLAGS += -I../TraceWorker
 
 CPP	=	@echo " g++ $@"; $(CROSS)g++
 CC	=	@echo " gcc $@"; $(CROSS)gcc
@@ -21,13 +24,25 @@ RM	= rm
 
 AFLAGS	+= -r   
 
-TARGET=client
 
-$(TARGET): $(LIB_SRC)
-	$(CPP)  -o $(TARGET) -g $(CFLAGS) $(DEP_INC) $(LIB_SRC) $(DEP_LIBS)
+LIB_TARGET=../CosApp/lib/libTraceWorker.a
+
+all	:	$(LIB_TARGET)
+
+$(LIB_TARGET): $(LIB_OBJS)
+	$(AR) $(AFLAGS) $@ $^
+	$(RANLIB) $@
+
+.c.o:
+	$(CC) -c $(CFLAGS) $^ -o $@
+
+.cpp.o:
+	$(CPP) -c -Wall $(CXXFLAGS) $^ -o $@
 
 clean:
-	$(RM) $(LIB_OBJS) client 
+	$(RM) $(LIB_OBJS) $(LIB_TARGET)
 
+install:
+	cp $(LIB_TARGET) ../Build/Libs/$(LIB_TARGET) 
 
 
