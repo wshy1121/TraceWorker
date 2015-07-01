@@ -269,6 +269,7 @@ void CBugKiller::printfStackInfo(int line, char *file_name)
 
 void CBugKiller::traceSignal(int signo)
 {
+#if 0
 	struct sigaction act;
 
 	act.sa_handler = CTraceWorkManager::ctrl_c_func;
@@ -276,6 +277,7 @@ void CBugKiller::traceSignal(int signo)
 	act.sa_flags = 0;
 
 	sigaction(signo, &act, NULL);	
+#endif
 }
 
 
