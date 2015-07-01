@@ -793,7 +793,7 @@ int CLogDataInf::packet(char *&packet)
 		I2CLen(infLen + m_lenSize, m_packet+pos, m_lenSize);
 		pos += m_lenSize;
 		memcpy(m_packet+pos, inf, infLen);
-		inf = m_packet+pos;
+		m_infs[i] = m_packet+pos;
 		pos += infLen;
 	}
 	I2CLen(mallocLen, m_packet+pos, m_lenSize);
