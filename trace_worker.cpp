@@ -44,6 +44,7 @@ class CTraceWorkManager
 public:
 	static CTraceWorkManager *instance();
 	bool startServer(const char *sip, int sport, const char *fileName);
+	bool isStarted();
 	int dealPacket(char *packet, int packetLen, CLogDataInf &dataInf);
 	void InsertHex(char *psBuf, int nBufLen, char *str, int strLen);
 	std::string &getBackTrace(std::string &backTrace);
@@ -73,6 +74,10 @@ static CTraceWorkManager *g_trace = CTraceWorkManager::instance();
 
 CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 {
+	if (!g_trace->isStarted())
+	{
+		return ;
+	}
 	char sSid[16];
 	char sTid[16];
 	char sLine[8];
@@ -100,6 +105,11 @@ CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 
 CCandy::~CCandy()
 {
+	if (!g_trace->isStarted())
+	{
+		return ;
+	}
+
 	char sSid[16];
 	char sTid[16];	
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
@@ -124,6 +134,11 @@ CCandy::~CCandy()
 
 void CBugKiller::InsertTrace(int line, char *file_name, const char* fmt, ...)
 {
+	if (!g_trace->isStarted())
+	{
+		return ;
+	}
+
 	char content[4096];
 	va_list ap;
 	va_start(ap,fmt);
@@ -155,6 +170,11 @@ void CBugKiller::InsertTrace(int line, char *file_name, const char* fmt, ...)
 
 void CBugKiller::InsertHex(int line, char *file_name, char *psBuf, int nBufLen)
 {
+	if (!g_trace->isStarted())
+	{
+		return ;
+	}
+
 	char str[4096];
 	g_trace->InsertHex(psBuf, nBufLen, str, sizeof(str));
 
@@ -183,6 +203,11 @@ void CBugKiller::InsertHex(int line, char *file_name, char *psBuf, int nBufLen)
 
 void CBugKiller::DispAll()
 {
+	if (!g_trace->isStarted())
+	{
+		return ;
+	}
+
 	char sSid[16];
 	char sTid[16];	
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
@@ -206,6 +231,11 @@ void CBugKiller::DispAll()
 
 void CBugKiller::InsertTag(int line, char *file_name, const char* fmt, ...)
 {
+	if (!g_trace->isStarted())
+	{
+		return ;
+	}
+
 	char content[4096];
 	va_list ap;
 	va_start(ap,fmt);
@@ -237,6 +267,11 @@ void CBugKiller::InsertTag(int line, char *file_name, const char* fmt, ...)
 
 void CBugKiller::printfMemInfMap()
 {
+	if (!g_trace->isStarted())
+	{
+		return ;
+	}
+
 	char sSid[16];
 	char sTid[16];	
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
@@ -318,6 +353,14 @@ bool CTraceWorkManager::startServer(const char *sip, int sport, const char *file
 	return true;
 }
 
+bool CTraceWorkManager::isStarted()
+{
+	if(-1 == m_socketClient)
+	{
+		return false;
+	}
+	return true;
+}
 void CTraceWorkManager::ctrl_c_func(int signo)
 {
 	CBugKiller::InsertTrace(__LINE__, (char *)__FILE__, "signal  %d", signo);
@@ -327,6 +370,11 @@ void CTraceWorkManager::ctrl_c_func(int signo)
 
 void CTraceWorkManager::openFile(const char *fileName)
 {
+	if (!g_trace->isStarted())
+	{
+		return ;
+	}
+
 	char sSid[16];
 	char sTid[16];
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
