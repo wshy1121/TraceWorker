@@ -356,7 +356,7 @@ bool CTraceWorkManager::startServer(const char *sip, int sport, const char *file
 
 bool CTraceWorkManager::isStarted()
 {
-	if(-1 == m_socketClient)
+	if(m_socketClient <= 0)
 	{
 		return false;
 	}
