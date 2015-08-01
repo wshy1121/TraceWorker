@@ -68,6 +68,7 @@ private:
 	CBase::pthread_mutex_t socketMutex;
 	int m_sessionId;
 	const int m_maxSessionId;
+	static CTraceWorkManager _instance;
 };
 
 static CTraceWorkManager *g_trace = CTraceWorkManager::instance();
@@ -326,6 +327,7 @@ int CBugKiller::reStart()
 	return CTraceWorkManager::instance()->reStart();
 }
 
+CTraceWorkManager CTraceWorkManager::_instance;
 CTraceWorkManager::CTraceWorkManager():m_sessionId(1), m_maxSessionId(1024*1024), m_socketClient(-1)
 {
 #ifdef WIN32	
@@ -336,7 +338,6 @@ CTraceWorkManager::CTraceWorkManager():m_sessionId(1), m_maxSessionId(1024*1024)
 
 CTraceWorkManager *CTraceWorkManager::instance()
 {
-	static CTraceWorkManager _instance;
 	return &_instance;
 }
 
