@@ -54,8 +54,8 @@ public:
 private:
 	CTraceWorkManager(); 
 	void openFile(const char *fileName);
-	SOCKET connect(const char *sip, int port);
-	int disConnect(SOCKET socket);	
+	int connect(const char *sip, int port);
+	int disConnect(int socket);	
 	int reConnect();
 	bool receiveInfData(CLogDataInf *pDataInf);
 	int receive(char *szText,int iLen);
@@ -64,7 +64,7 @@ private:
 	const char *m_sip;
 	int m_port;
 	std::string m_fileName;
-	SOCKET m_socketClient;
+	int m_socketClient;
 	CBase::pthread_mutex_t socketMutex;
 	int m_sessionId;
 	const int m_maxSessionId;
@@ -75,9 +75,9 @@ static CTraceWorkManager *g_trace = CTraceWorkManager::instance();
 
 CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 {
-	if (!g_trace->isStarted())
+	//if (!g_trace->isStarted())
 	{
-		return ;
+		//return ;
 	}
 	char sSid[16];
 	char sTid[16];
@@ -106,9 +106,9 @@ CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 
 CCandy::~CCandy()
 {
-	if (!g_trace->isStarted())
+	//if (!g_trace->isStarted())
 	{
-		return ;
+		//return ;
 	}
 
 	char sSid[16];
@@ -397,9 +397,9 @@ void CTraceWorkManager::openFile(const char *fileName)
 	return ;	
 }
 
-SOCKET CTraceWorkManager::connect(const char *sip, int port)
+int CTraceWorkManager::connect(const char *sip, int port)
 {
-	SOCKET socketClient = socket(AF_INET, SOCK_STREAM, 0);
+	int socketClient = socket(AF_INET, SOCK_STREAM, 0);
 	if(-1 == socketClient)
 	{
 		return -1;
@@ -420,7 +420,7 @@ SOCKET CTraceWorkManager::connect(const char *sip, int port)
 	return socketClient;
 }
 
-int CTraceWorkManager::disConnect(SOCKET socket)
+int CTraceWorkManager::disConnect(int socket)
 {
 	return CBase::close(socket);
 }
