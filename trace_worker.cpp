@@ -514,7 +514,6 @@ int CTraceWorkManager::receive(char *szText,int iLen)
 	{
 		recvBufLen = ::recv(m_socketClient, szText+totalRecvLen, iLen-totalRecvLen, 0);
 		if (recvBufLen <= 0)
-
 		{
 			return -1;
 		}
@@ -542,6 +541,7 @@ int CTraceWorkManager::send(char *szText,int len)
 		rc=::send(m_socketClient,szText,cnt,0);
 		if(rc==-1)
 		{
+			m_socketClient = -1;
 			return -1;
 		}
 		if(rc==0)
