@@ -75,9 +75,9 @@ static CTraceWorkManager *g_trace = CTraceWorkManager::instance();
 
 CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 {
-	//if (!g_trace->isStarted())
+	if (!g_trace->isStarted())
 	{
-		//return ;
+		return ;
 	}
 	char sSid[16];
 	char sTid[16];
@@ -106,9 +106,9 @@ CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 
 CCandy::~CCandy()
 {
-	//if (!g_trace->isStarted())
+	if (!g_trace->isStarted())
 	{
-		//return ;
+		return ;
 	}
 
 	char sSid[16];
@@ -827,7 +827,10 @@ int CLogDataInf::packet()
 
 int CLogDataInf::packet(char *&packet)
 {
-	char *tmpPacket = m_packet;
+	if (m_packet)
+	{
+		free(m_packet);
+	}
 	int mallocLen = m_lenSize + m_packetLen + m_lenSize;
 	m_packet = (char *)malloc(mallocLen);
 
@@ -850,10 +853,6 @@ int CLogDataInf::packet(char *&packet)
 	I2CLen(mallocLen, m_packet+pos, m_lenSize);
 
 	packet = m_packet;
-	if (tmpPacket)
-	{
-		free(tmpPacket);
-	}	
 	return mallocLen;
 }
 int CLogDataInf::unPacket(char *packet)
