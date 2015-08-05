@@ -49,7 +49,7 @@ public:
 	void InsertHex(char *psBuf, int nBufLen, char *str, int strLen);
 	std::string &getBackTrace(std::string &backTrace);
 	int reStart();
-	int getSessionId();	
+	int getSessionId(bool enabl = false);	
 	static void ctrl_c_func(int signo);
 private:
 	CTraceWorkManager(); 
@@ -113,7 +113,7 @@ CCandy::~CCandy()
 
 	char sSid[16];
 	char sTid[16];	
-	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
+	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId(true));
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"destroyCandy");
@@ -453,9 +453,12 @@ int CTraceWorkManager::reStart()
 	return 0;
 }
 
-int CTraceWorkManager::getSessionId()
+int CTraceWorkManager::getSessionId(bool enabl)
 {
-	return 0;
+	if (!enabl)
+	{
+		return 0;
+	}
 	if (m_sessionId > m_maxSessionId)
 	{
 		m_sessionId = 0;
