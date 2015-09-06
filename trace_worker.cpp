@@ -113,7 +113,7 @@ CCandy::~CCandy()
 
 	char sSid[16];
 	char sTid[16];	
-	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId(true));
+	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"destroyCandy");
@@ -143,13 +143,13 @@ void CBugKiller::InsertTrace(int line, char *file_name, const char* fmt, ...)
 	char content[4096];
 	va_list ap;
 	va_start(ap,fmt);
-	CBase::vsnprintf(content,sizeof(content), fmt, ap);
+	int charNum = CBase::vsnprintf(content,sizeof(content), fmt, ap);
 	va_end(ap);
 
 	char sSid[16];
 	char sTid[16];
 	char sLine[8];	
-	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
+	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId(charNum > 64));
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 	
