@@ -328,7 +328,7 @@ int CBugKiller::reStart()
 }
 
 CTraceWorkManager CTraceWorkManager::_instance;
-CTraceWorkManager::CTraceWorkManager():m_sessionId(1), m_maxSessionId(1024*1024), m_socketClient(-1)
+CTraceWorkManager::CTraceWorkManager():m_socketClient(-1), m_sessionId(1), m_maxSessionId(1024*1024)
 {
 #ifdef WIN32	
 		WSADATA wsa={0};
