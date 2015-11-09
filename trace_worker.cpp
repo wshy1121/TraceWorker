@@ -343,6 +343,11 @@ CTraceWorkManager *CTraceWorkManager::instance()
 
 bool CTraceWorkManager::startServer(const char *sip, int sport, const char *fileName)
 {
+	if (m_socketClient > 0)
+	{
+		return true;
+	}
+
 	int serverPort = sport;
 	CBase::pthread_mutex_init(&socketMutex, NULL);
 	m_socketClient = connect(sip, serverPort);
