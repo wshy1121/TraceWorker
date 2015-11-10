@@ -909,6 +909,16 @@ int CLogDataInf::getPacket(char *&packet)
 extern "C"
 {
 //#define trace_level(level)  CCandy candy(__LINE__, (char *)__FILE__, (char *)__FUNCTION__, level)
+CCandy *createCandy(int line, char *file_name, char *func_name, int display_level)
+{
+	return new CCandy(line, file_name, func_name, display_level);
+}
+
+void destroyCandy(CCandy *pCandy)
+{
+	delete pCandy;
+}
+
 //#define trace_printf(format, ...)    CBugKiller::InsertTrace(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
 //#define trace_all()    CBugKiller::DispAll()
 //#define trace_tag(format, ...)  CBugKiller::InsertTag(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)

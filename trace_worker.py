@@ -1,31 +1,18 @@
 # encoding:utf8
+import ctypes
+import sys
+traceWorkerDll = ctypes.CDLL('build/libTraceWorker.so')
 
 class NewClass(object):
     num_count = 0 # 
-    def __init__(self,name):
-        self.name = name
-        self.__class__.num_count += 1
-        print name,NewClass.num_count
+    def __init__(self, level = 100):
+        line = sys._getframe().f_back.f_lineno
+        file_name = sys._getframe().f_back.f_code.co_filename
+        func_name = sys._getframe().f_back.f_code.co_name
+        self.handle = traceWorkerDll.createCandy(line, file_name, func_name, level)
+
     def __del__(self):
-        self.__class__.num_count -= 1
-        print "Del",self.name,self.__class__.num_count
-    def test():
-        print "aa"
-def test1():
-    aa = NewClass("Hello")
-    bb = NewClass("World")
-    cc = NewClass("aaaa")
-
-import sys
-def fun1():
-    print sys._getframe().f_code.co_name
-
-    print sys._getframe().f_back.f_code.co_name
-    print sys._getframe().f_back.f_lineno
-    print sys._getframe().f_back.f_code.co_filename
-
-def fun2():
-    fun1()
+        traceWorkerDll.destroyCandy(self.handle)
 
 def printf(fmt, *arg):  
     print fmt % arg  
@@ -33,10 +20,14 @@ def printf(fmt, *arg):
 printf("How do you do? %s, %d", "123", 3)
 
 import time
-import ctypes
 
+
+def test1():
+    aa = NewClass()
+    
 if __name__ == '__main__': 
-    pdll = ctypes.CDLL('build/libTraceWorker.so')
-    pdll.startServer("127.0.0.1", 8889, "./Debug.py")
-    time.sleep(10)
+    traceWorkerDll.startServer("127.0.0.1", 8889, "./Debug.cpp")
+    
+    test1()
+    time.sleep(1)
 
