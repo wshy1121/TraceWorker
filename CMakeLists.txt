@@ -6,6 +6,7 @@
 
 
 PROJECT(HMSProxy)
+cmake_minimum_required(VERSION 2.8)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -g -Wall -fPIC -O0")
@@ -18,10 +19,10 @@ SET(SRC_SRCS
 )
 
 # shared library
-#ADD_LIBRARY(TraceWorker SHARED ${SRC_SRCS} )
+ADD_LIBRARY(TraceWorker SHARED ${SRC_SRCS} )
 
 #static library
-ADD_LIBRARY(TraceWorker STATIC ${SRC_SRCS})
+#ADD_LIBRARY(TraceWorker STATIC ${SRC_SRCS})
 
 # link library
 #TARGET_LINK_LIBRARIES(TraceWorker)

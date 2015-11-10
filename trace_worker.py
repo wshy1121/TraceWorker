@@ -15,8 +15,6 @@ def test1():
     aa = NewClass("Hello")
     bb = NewClass("World")
     cc = NewClass("aaaa")
-test1()
-
 
 import sys
 def fun1():
@@ -29,5 +27,16 @@ def fun1():
 def fun2():
     fun1()
 
-fun2()
+def printf(fmt, *arg):  
+    print fmt % arg  
+
+printf("How do you do? %s, %d", "123", 3)
+
+import time
+import ctypes
+
+if __name__ == '__main__': 
+    pdll = ctypes.CDLL('build/libTraceWorker.so')
+    pdll.startServer("127.0.0.1", 8889, "./Debug.py")
+    time.sleep(10)
 

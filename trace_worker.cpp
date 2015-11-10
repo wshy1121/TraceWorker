@@ -906,4 +906,24 @@ int CLogDataInf::getPacket(char *&packet)
 	return m_lenSize + m_packetLen + m_lenSize;
 }
 
+extern "C"
+{
+//#define trace_level(level)  CCandy candy(__LINE__, (char *)__FILE__, (char *)__FUNCTION__, level)
+//#define trace_printf(format, ...)    CBugKiller::InsertTrace(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
+//#define trace_all()    CBugKiller::DispAll()
+//#define trace_tag(format, ...)  CBugKiller::InsertTag(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
+//#define trace_str(str, len)    CBugKiller::InsertHex(__LINE__, (char *)__FILE__, str, len)
+//#define trace_mem()   CBugKiller::printfMemInfMap()
+//#define trace_stack()	CBugKiller::printfStackInfo(__LINE__, (char *)__FILE__)
+//#define trace_num(num)	 trace_printf("num:%d    %d", num, __LINE__)
+//#define trace_err(num)       trace_printf("ERRERRERRERRERRERRERR:%d    %d    %s", (num), __LINE__, __FILE__)
+//#define trace_unworker()  trace_level(0)
+//#define trace_worker()   trace_level(100)
+bool startServer(const char *sip, int sport, const char *fileName)
+{
+	return CBugKiller::startServer(sip, sport, fileName);
+}
+//#define trace_signal(signo)  CBugKiller::traceSignal(signo)
+
+}
 
