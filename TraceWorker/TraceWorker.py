@@ -16,4 +16,16 @@ def test1():
     bb = NewClass("World")
     cc = NewClass("aaaa")
 test1()
-print "Over"
+
+
+import sys
+def fun1():
+    print sys._getframe().f_code.co_name
+    print sys._getframe().f_back.f_code.co_name
+    print sys._getframe().f_lineno
+
+def fun2():
+    fun1()
+
+fun2()
+
