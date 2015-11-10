@@ -21,8 +21,10 @@ test1()
 import sys
 def fun1():
     print sys._getframe().f_code.co_name
+
     print sys._getframe().f_back.f_code.co_name
-    print sys._getframe().f_lineno
+    print sys._getframe().f_back.f_lineno
+    print sys._getframe().f_back.f_code.co_filename
 
 def fun2():
     fun1()
