@@ -26,3 +26,4 @@ Release
 /TraceWorker/ipch
 *.d
 *.o
+/build
