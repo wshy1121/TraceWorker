@@ -3,7 +3,7 @@ import ctypes
 import sys
 traceWorkerDll = ctypes.CDLL('build/libTraceWorker.so')
 
-class NewClass(object):
+class trace_worker(object):
     num_count = 0 # 
     def __init__(self, level = 100):
         line = sys._getframe().f_back.f_lineno
@@ -14,20 +14,22 @@ class NewClass(object):
     def __del__(self):
         traceWorkerDll.destroyCandy(self.handle)
 
-def printf(fmt, *arg):  
-    print fmt % arg  
+def trace_start(sip, sport, fileName):
+    traceWorkerDll.startServer(sip, sport, fileName)
 
-printf("How do you do? %s, %d", "123", 3)
-
-import time
+def trace_printf(fmt, *arg):  
+    line = sys._getframe().f_back.f_lineno
+    file_name = sys._getframe().f_back.f_code.co_filename
+    traceWorkerDll.InsertTrace(line, file_name, "%s", fmt % arg) 
 
 
 def test1():
-    aa = NewClass()
-    
+    trace=trace_worker()
+    trace_printf("%d", 100);
+    trace_printf("How do you do? %s, %d", "123", 3)
+
 if __name__ == '__main__': 
-    traceWorkerDll.startServer("127.0.0.1", 8889, "./Debug.cpp")
-    
+    trace_start("127.0.0.1", 8889, "./Debug.cpp")
     test1()
-    time.sleep(1)
+
 

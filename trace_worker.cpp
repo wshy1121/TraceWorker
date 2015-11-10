@@ -47,6 +47,7 @@ public:
 	bool isStarted();
 	int dealPacket(char *packet, int packetLen, CLogDataInf &dataInf);
 	void InsertHex(char *psBuf, int nBufLen, char *str, int strLen);
+	void InsertTrace(int line, char *file_name, const char *format, va_list ap);
 	std::string &getBackTrace(std::string &backTrace);
 	int reStart();
 	int getSessionId(bool enabl = false);	
@@ -135,38 +136,10 @@ CCandy::~CCandy()
 
 void CBugKiller::InsertTrace(int line, char *file_name, const char* fmt, ...)
 {
-	if (!g_trace->isStarted())
-	{
-		return ;
-	}
-
-	char content[4096];
 	va_list ap;
 	va_start(ap,fmt);
-	int charNum = CBase::vsnprintf(content,sizeof(content), fmt, ap);
+	g_trace->InsertTrace(line, file_name, fmt, ap);
 	va_end(ap);
-
-	char sSid[16];
-	char sTid[16];
-	char sLine[8];	
-	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId(charNum > 64));
-	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
-	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
-	
-	CLogDataInf dataInf;
-	dataInf.putInf((char *)"insertTrace");
-	dataInf.putInf(sSid);
-	dataInf.putInf(sTid);
-	dataInf.putInf(sLine);
-	dataInf.putInf(file_name);
-	dataInf.putInf("");
-	dataInf.putInf("0");
-	dataInf.putInf(content);
-	
-	char *packet = NULL;
-	int packetLen = dataInf.packet(packet);
-	g_trace->dealPacket(packet, packetLen, dataInf);
-	return ;
 }
 
 void CBugKiller::InsertHex(int line, char *file_name, char *psBuf, int nBufLen)
@@ -624,6 +597,39 @@ void CTraceWorkManager::InsertHex(char *psBuf, int nBufLen, char *str, int strLe
 
 }
 
+void CTraceWorkManager::InsertTrace(int line, char *file_name, const char *format, va_list ap)
+{
+	if (!g_trace->isStarted())
+	{
+		return ;
+	}
+
+	char content[4096];
+	CBase::vsnprintf(content,sizeof(content), format, ap);
+	
+	char sSid[16];
+	char sTid[16];
+	char sLine[8];	
+	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
+	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
+	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
+	
+	CLogDataInf dataInf;
+	dataInf.putInf((char *)"insertTrace");
+	dataInf.putInf(sSid);
+	dataInf.putInf(sTid);
+	dataInf.putInf(sLine);
+	dataInf.putInf(file_name);
+	dataInf.putInf("");
+	dataInf.putInf("0");
+	dataInf.putInf(content);
+	
+	char *packet = NULL;
+	int packetLen = dataInf.packet(packet);
+	g_trace->dealPacket(packet, packetLen, dataInf);
+}
+
+
 std::string &CTraceWorkManager::getBackTrace(std::string &backTrace)
 {
 	void *stack_addr[32];
@@ -920,6 +926,14 @@ void destroyCandy(CCandy *pCandy)
 }
 
 //#define trace_printf(format, ...)    CBugKiller::InsertTrace(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
+void InsertTrace(int line, char *file_name, const char* fmt, ...)
+{
+	va_list ap;
+	va_start(ap,fmt);
+	g_trace->InsertTrace(line, file_name, fmt, ap);
+	va_end(ap);
+}
+
 //#define trace_all()    CBugKiller::DispAll()
 //#define trace_tag(format, ...)  CBugKiller::InsertTag(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
 //#define trace_str(str, len)    CBugKiller::InsertHex(__LINE__, (char *)__FILE__, str, len)
