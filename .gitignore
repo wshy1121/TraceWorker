@@ -27,3 +27,4 @@ Release
 *.d
 *.o
 /build
+*.pyc

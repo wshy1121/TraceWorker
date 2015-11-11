@@ -1,7 +1,7 @@
 # encoding:utf8
 import ctypes
 import sys
-traceWorkerDll = ctypes.CDLL('build/libTraceWorker.so')
+traceWorkerDll = ctypes.CDLL('../TraceWorker/build/libTraceWorker.so')
 
 class trace_worker(object):
     num_count = 0 # 

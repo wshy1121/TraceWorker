@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <string>
+#include <map>
 typedef int SOCKET;
 #endif
 #include "trace_worker.h"
@@ -914,18 +915,32 @@ int CLogDataInf::getPacket(char *&packet)
 
 extern "C"
 {
-//#define trace_level(level)  CCandy candy(__LINE__, (char *)__FILE__, (char *)__FUNCTION__, level)
-CCandy *createCandy(int line, char *file_name, char *func_name, int display_level)
+static std::map<int, CCandy *> candyMap;
+
+int createCandy(int line, char *file_name, char *func_name, int display_level)
 {
-	return new CCandy(line, file_name, func_name, display_level);
+	CCandy *pCandy = new CCandy(line, file_name, func_name, display_level);
+	int sessionId = g_trace->getSessionId(true);
+
+	candyMap.insert(std::make_pair(sessionId, pCandy));
+	
+	printf("createCandy  sessionId  %d  %p\n", sessionId, pCandy);
+	return sessionId;
 }
 
-void destroyCandy(CCandy *pCandy)
+void destroyCandy(int sessionId)
 {
+	std::map<int, CCandy *>::iterator iter = candyMap.find(sessionId);
+	if (iter == candyMap.end())
+	{
+		return ;
+	}
+	
+	CCandy *pCandy = iter->second;	
+	printf("destroyCandy  sessionId  %d  %p\n", sessionId, pCandy);
 	delete pCandy;
+	candyMap.erase(iter);
 }
-
-//#define trace_printf(format, ...)    CBugKiller::InsertTrace(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
 void InsertTrace(int line, char *file_name, const char* fmt, ...)
 {
 	va_list ap;
