@@ -7,10 +7,13 @@ class trace_worker(object):
     num_count = 0 # 
     def __init__(self, level = 100):
         line = sys._getframe().f_back.f_lineno
-        file_name = sys._getframe().f_back.f_code.co_filename
-        func_name = sys._getframe().f_back.f_code.co_name
-        self.handle = traceWorkerDll.createCandy(line, file_name, func_name, level)
+        fileName = sys._getframe().f_back.f_code.co_filename
+        funcName = sys._getframe().f_back.f_code.co_name
+        preLine = sys._getframe().f_back.f_back.f_lineno
+        preFileName = sys._getframe().f_back.f_back.f_code.co_filename
+        preFuncName = sys._getframe().f_back.f_back.f_code.co_name
 
+        self.handle = traceWorkerDll.createCandy(line, fileName, funcName, preLine, preFileName, preFuncName, level)
     def __del__(self):
         traceWorkerDll.destroyCandy(self.handle)
 

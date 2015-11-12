@@ -75,7 +75,7 @@ private:
 
 static CTraceWorkManager *g_trace = CTraceWorkManager::instance();
 
-CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
+CCandy::CCandy(int line, char *file_name, char *func_name, int pre_line, char *pre_file_name, char *pre_func_name, int display_level)
 {
 	if (!g_trace->isStarted())
 	{
@@ -99,6 +99,12 @@ CCandy::CCandy(int line, char *file_name, char *func_name, int display_level)
 	dataInf.putInf(func_name);
 	dataInf.putInf(sLevel);
 	dataInf.putInf("NULL");
+
+	char preLine[8];
+	CBase::snprintf(preLine, sizeof(preLine), "%d", pre_line);
+	dataInf.putInf(preLine);
+	dataInf.putInf(pre_file_name);
+	dataInf.putInf(pre_func_name);
 	
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
@@ -917,14 +923,12 @@ extern "C"
 {
 static std::map<int, CCandy *> candyMap;
 
-int createCandy(int line, char *file_name, char *func_name, int display_level)
+int createCandy(int line, char *fileName, char *funcName, int preLine, char *preFileName, char *preFuncName, int displayLevel)
 {
-	CCandy *pCandy = new CCandy(line, file_name, func_name, display_level);
+	CCandy *pCandy = new CCandy(line, fileName, funcName, preLine, preFileName, preFuncName, displayLevel);
 	int sessionId = g_trace->getSessionId(true);
 
 	candyMap.insert(std::make_pair(sessionId, pCandy));
-	
-	printf("createCandy  sessionId  %d  %p\n", sessionId, pCandy);
 	return sessionId;
 }
 
@@ -937,7 +941,6 @@ void destroyCandy(int sessionId)
 	}
 	
 	CCandy *pCandy = iter->second;	
-	printf("destroyCandy  sessionId  %d  %p\n", sessionId, pCandy);
 	delete pCandy;
 	candyMap.erase(iter);
 }

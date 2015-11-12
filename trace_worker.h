@@ -46,7 +46,7 @@ public:
 class CCandy
 {
 public:
-	CCandy(int line=__LINE__, char *file_name=(char *)__FILE__, char *func_name=(char *)"__FUNCTION__", int display_level=100);
+	CCandy(int line=__LINE__, char *file_name=(char *)__FILE__, char *func_name=(char *)"__FUNCTION__", int pre_line=0, char *pre_file_name="", char *pre_func_name="", int display_level=100);
 	~CCandy();
 };
 
@@ -68,7 +68,7 @@ private:
 };
 
 #if !defined(NO_CTIME_CALC)
-#define trace_level(level)  CCandy candy(__LINE__, (char *)__FILE__, (char *)__FUNCTION__, level)
+#define trace_level(level)  CCandy candy(__LINE__, (char *)__FILE__, (char *)__FUNCTION__, 0, "", ""level)
 #define trace_printf(format, ...)    CBugKiller::InsertTrace(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
 #define trace_all()    CBugKiller::DispAll()
 #define trace_tag(format, ...)  CBugKiller::InsertTag(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
