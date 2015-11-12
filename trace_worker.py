@@ -23,7 +23,7 @@ def trace_start(sip, sport, fileName):
 def trace_printf(fmt, *arg):  
     line = sys._getframe().f_back.f_lineno
     file_name = sys._getframe().f_back.f_code.co_filename
-    traceWorkerDll.InsertTrace(line, file_name, "%s", fmt % arg) 
+    traceWorkerDll.InsertTrace(line, file_name, "%s", str(fmt % arg)) 
 
 
 def test1():
