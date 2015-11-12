@@ -68,7 +68,7 @@ private:
 };
 
 #if !defined(NO_CTIME_CALC)
-#define trace_level(level)  CCandy candy(__LINE__, (char *)__FILE__, (char *)__FUNCTION__, 0, "", ""level)
+#define trace_level(level)  CCandy candy(__LINE__, (char *)__FILE__, (char *)__FUNCTION__, 0, (char *)"", (char *)"", level)
 #define trace_printf(format, ...)    CBugKiller::InsertTrace(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
 #define trace_all()    CBugKiller::DispAll()
 #define trace_tag(format, ...)  CBugKiller::InsertTag(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
