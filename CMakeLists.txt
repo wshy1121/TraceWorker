@@ -8,6 +8,14 @@
 PROJECT(HMSProxy)
 cmake_minimum_required(VERSION 2.8)
 
+IF (WIN32)
+    ADD_DEFINITIONS(-DWIN32)
+ELSEIF (UNIX)
+    #do something related to UNIX
+ELSEIF(APPLE)
+    #do something related to APPLE
+ENDIF (WIN32)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -g -Wall -fPIC -O0")
 else()
@@ -27,7 +35,11 @@ ADD_LIBRARY(TraceWorker SHARED ${SRC_SRCS} )
 #ADD_LIBRARY(TraceWorker STATIC ${SRC_SRCS})
 
 # link library
-#TARGET_LINK_LIBRARIES(TraceWorker)
+IF (WIN32)
+    TARGET_LINK_LIBRARIES(TraceWorker wsock32)
+ELSEIF (UNIX)
+    TARGET_LINK_LIBRARIES(TraceWorker)
+ENDIF (WIN32)
 
 # clean
 SET_TARGET_PROPERTIES(TraceWorker PROPERTIES CLEAN_DIRECT_OUTPUT 1)

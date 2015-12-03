@@ -2,9 +2,13 @@
 #define _TRACE_BASE_H
 
 #ifdef WIN32
+#include <windows.h>
+#include <process.h>
+#include <assert.h>
 #else
 #include <pthread.h>
 #include <stdarg.h>
+#include <execinfo.h>
 #endif
 
 

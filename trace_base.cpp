@@ -2,17 +2,13 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <execinfo.h>
+#include <stdarg.h> 
 
 int CBase::snprintf(char *str, size_t size, const char *format, ...)
 {
 	va_list ap;
 	va_start(ap,format);
-#ifdef WIN32
-	int ret = vsnprintf_s(str, size, _TRUNCATE, format, ap);
-#else
 	int ret = ::vsnprintf(str, size, format, ap);
-#endif
 	va_end(ap);
 	return ret;
 }
@@ -29,25 +25,12 @@ CBase::pthread_t CBase::pthread_self(void)
 
 int CBase::vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {
-#ifdef WIN32
-	return vsnprintf_s(str, size, _TRUNCATE, format, ap);
-#else
 	return ::vsnprintf(str, size, format, ap);
-#endif
 }
 
 char *CBase::strcpy(char *dest, const char *src)
 {
-#ifdef WIN32
-	if (dest != NULL)
-	{
-		strcpy_s(dest, strlen(src)+1, src);
-	}
-	return dest;
-#else
 	return ::strcpy(dest, src);
-#endif
-
 }
 
 int CBase::pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg)

@@ -11,8 +11,6 @@
 #include <signal.h>
 typedef int SOCKET;
 #endif
-
-#include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -23,7 +21,7 @@ typedef int SOCKET;
 class CCandy
 {
 public:
-	CCandy(int line=__LINE__, char *file_name=(char *)__FILE__, char *func_name=(char *)"__FUNCTION__", int pre_line=0, char *pre_file_name="", char *pre_func_name="", int display_level=100);
+	CCandy(int line=__LINE__, char *file_name=(char *)__FILE__, char *func_name=(char *)"__FUNCTION__", int pre_line=0, char *pre_file_name=(char *)"", char *pre_func_name=(char *)"", int display_level=100);
 	~CCandy();
 };
 

@@ -1,15 +1,14 @@
 #ifdef WIN32
 #include <windows.h>
-#pragma comment(lib,"ws2_32.lib")
 #else
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <string>
-#include <map>
 typedef int SOCKET;
 #endif
+#include <map>
 #include "trace_worker.h"
 #include "trace_base.h"
 
