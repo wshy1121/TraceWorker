@@ -16,6 +16,8 @@ endif()
 
 SET(SRC_SRCS
   trace_worker.cpp
+  trace_packet.cpp
+  trace_base.cpp
 )
 
 # shared library

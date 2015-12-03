@@ -28,3 +28,12 @@ Release
 *.o
 /build
 *.pyc
+/TraceWorker.IAB
+/TraceWorker.IAD
+/TraceWorker.IMB
+/TraceWorker.IMD
+/TraceWorker.PFI
+/TraceWorker.PO
+/TraceWorker.PR
+/TraceWorker.PRI
+/TraceWorker.PS
