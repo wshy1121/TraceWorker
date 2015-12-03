@@ -1,6 +1,9 @@
 # encoding:utf8
 import ctypes
 import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 traceWorkerDll = ctypes.CDLL('../TraceWorker/build/libTraceWorker.so')
 
 class trace_worker(object):
