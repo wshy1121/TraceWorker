@@ -29,10 +29,10 @@ SET(SRC_SRCS
 )
 
 # shared library
-ADD_LIBRARY(TraceWorker SHARED ${SRC_SRCS} )
+#ADD_LIBRARY(TraceWorker SHARED ${SRC_SRCS} )
 
 #static library
-#ADD_LIBRARY(TraceWorker STATIC ${SRC_SRCS})
+ADD_LIBRARY(TraceWorker STATIC ${SRC_SRCS})
 
 # link library
 IF (WIN32)

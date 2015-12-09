@@ -14,7 +14,6 @@ typedef int SOCKET;
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-#include <string>
 #include "trace_packet.h"
 
 
