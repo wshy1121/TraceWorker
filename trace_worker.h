@@ -14,6 +14,7 @@ typedef int SOCKET;
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#ifdef __cplusplus
 #include "trace_packet.h"
 
 
@@ -69,6 +70,18 @@ private:
 #define trace_worker()   
 #define trace_start(sip, sport, fileName)  
 #define trace_signal(signo)  
+#endif
+#else
+#if !defined(NO_CTIME_CALC)
+#define trace_enter()  int traceSession880110 = createCandy(__LINE__, (char *)__FILE__, (char *)__FUNCTION__, 0, (char *)"", (char *)"", 100)
+#define trace_exit()  destroyCandy(traceSession880110)
+#define trace_printf(format, ...)  InsertTrace(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
+#define trace_start(sip, sport, fileName)  startServer(sip, sport, fileName)
+#else
+#define trace_enter()    
+#define trace_exit(sessionId)  
+#define trace_printf(format, ...)      
+#define trace_start(sip, sport, fileName)  
 
 #endif
 
@@ -80,6 +93,8 @@ private:
 
 
 
+
+#endif
 #endif
 
 
