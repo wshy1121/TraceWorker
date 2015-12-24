@@ -13,8 +13,8 @@ typedef int SOCKET;
 #endif
 #include <stdarg.h>
 #include <stdio.h>
-#include <string.h>
 #ifdef __cplusplus
+#include <string>
 #include "trace_packet.h"
 
 
@@ -23,6 +23,10 @@ class CCandy
 public:
 	CCandy(int line=__LINE__, char *file_name=(char *)__FILE__, char *func_name=(char *)"__FUNCTION__", int pre_line=0, char *pre_file_name=(char *)"", char *pre_func_name=(char *)"", int display_level=100);
 	~CCandy();
+private:
+	int m_line;
+	std::string m_fileName;
+	std::string m_funcName;
 };
 
 
@@ -74,7 +78,7 @@ private:
 #else
 #if !defined(NO_CTIME_CALC)
 #define trace_enter()  int traceSession880110 = createCandy(__LINE__, (char *)__FILE__, (char *)__FUNCTION__, 0, (char *)"", (char *)"", 100)
-#define trace_exit()  destroyCandy(traceSession880110)
+#define trace_exit()  do{trace_printf("NULL");destroyCandy(traceSession880110);}while(0)
 #define trace_printf(format, ...)  InsertTrace(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
 #define trace_start(sip, sport, fileName)  startServer(sip, sport, fileName)
 #else

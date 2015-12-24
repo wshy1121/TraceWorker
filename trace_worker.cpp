@@ -5,7 +5,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <string>
+#include <string.h>
 typedef int SOCKET;
 #endif
 #include <map>
@@ -53,6 +53,10 @@ CCandy::CCandy(int line, char *file_name, char *func_name, int pre_line, char *p
 	{
 		return ;
 	}
+	m_line = line;
+	m_fileName = file_name;
+	m_funcName = func_name;
+	
 	char sSid[16];
 	char sTid[16];
 	char sLine[8];
@@ -93,15 +97,17 @@ CCandy::~CCandy()
 
 	char sSid[16];
 	char sTid[16];	
+	char sLine[8];
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
+	CBase::snprintf(sLine, sizeof(sLine), "%d", m_line);
 	CLogDataInf dataInf;
 	dataInf.putInf((char *)"destroyCandy");
 	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
-	dataInf.putInf("0");
-	dataInf.putInf("");
-	dataInf.putInf("");
+	dataInf.putInf(sLine);
+	dataInf.putInf(m_fileName.c_str());
+	dataInf.putInf(m_funcName.c_str());
 	dataInf.putInf("0");
 	dataInf.putInf("");
 	
