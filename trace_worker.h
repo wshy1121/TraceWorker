@@ -81,11 +81,13 @@ private:
 #define trace_exit()  do{trace_printf("NULL");destroyCandy(traceSession880110);}while(0)
 #define trace_printf(format, ...)  InsertTrace(__LINE__, (char *)__FILE__, format, ## __VA_ARGS__)
 #define trace_start(sip, sport, fileName)  startServer(sip, sport, fileName)
+#define trace_str(str, len)    InsertHex(__LINE__, (char *)__FILE__, str, len)
 #else
 #define trace_enter()    
 #define trace_exit(sessionId)  
 #define trace_printf(format, ...)      
 #define trace_start(sip, sport, fileName)  
+#define trace_str(str, len)   
 
 #endif
 
