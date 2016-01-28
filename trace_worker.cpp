@@ -640,6 +640,7 @@ std::string &CTraceWorkManager::getBackTrace(std::string &backTrace)
 
 extern "C"
 {
+static CBase::pthread_mutex_t candyMapMutex;
 static std::map<int, CCandy *> candyMap;
 
 int createCandy(int line, char *fileName, char *funcName, int preLine, char *preFileName, char *preFuncName, int displayLevel)
@@ -647,21 +648,24 @@ int createCandy(int line, char *fileName, char *funcName, int preLine, char *pre
 	CCandy *pCandy = new CCandy(line, fileName, funcName, preLine, preFileName, preFuncName, displayLevel);
 	int sessionId = g_trace->getSessionId(true);
 
+	CBase::pthread_mutex_lock(&candyMapMutex);
 	candyMap.insert(std::make_pair(sessionId, pCandy));
+	CBase::pthread_mutex_unlock(&candyMapMutex);
 	return sessionId;
 }
 
 void destroyCandy(int sessionId)
 {
+	CBase::pthread_mutex_lock(&candyMapMutex);
 	std::map<int, CCandy *>::iterator iter = candyMap.find(sessionId);
 	if (iter == candyMap.end())
-	{
+	{	CBase::pthread_mutex_unlock(&candyMapMutex);
 		return ;
 	}
-	
 	CCandy *pCandy = iter->second;	
-	delete pCandy;
 	candyMap.erase(iter);
+	CBase::pthread_mutex_unlock(&candyMapMutex);
+	delete pCandy;
 }
 void InsertTrace(int line, char *file_name, const char* fmt, ...)
 {
