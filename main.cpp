@@ -1,4 +1,6 @@
+#include <string.h>
 #include "trace_worker.h"
+#include "trace_base.h"
 
 char testData[16*1024];
 //²âÊÔCTimeCalcÊ¹ÓÃ
@@ -58,11 +60,12 @@ void* test1(void *pArg)
 
 int main()
 {
-	CBugKiller::startServer("127.0.0.1");
+	trace_start("127.0.0.1", 8889, "../Log/TraceWorkerDebug.cpp");
 	{
-		trace_worker();
+		fun0(5);
+		
 	}
-
+	return 0;
 	while (1)
 	{
 		{
@@ -70,7 +73,6 @@ int main()
 			fun0(5);
 			//CBase::usleep(100);
 		}
-		g_trace->reConnect();
 	}
 	return 0;
 }
@@ -81,13 +83,12 @@ int main()
 int testThreads()
 {
 	char str[4096];
-	g_trace->InsertHex(testData, sizeof(testData), str, sizeof(str));
 
 	int dataLen = sizeof(testData);
 	memset(testData, 'A', dataLen);
 	testData[dataLen-1] = '\n';
 	
-	CBugKiller::startServer("127.0.0.1");
+	trace_start("127.0.0.1", 8889, "TraceWorkerDebug.cpp");
 	const int threadNum = 10;
 	CBase::pthread_t thread_id[threadNum];	
 

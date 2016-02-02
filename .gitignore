@@ -37,3 +37,9 @@ Release
 /TraceWorker.PR
 /TraceWorker.PRI
 /TraceWorker.PS
+/buildWin/libTraceWorker.dll
+/buildWin/libTraceWorker.dll.a
+/buildWin/Makefile
+/buildWin/CMakeFiles
+/buildWin/cmake_install.cmake
+/buildWin/CMakeCache.txt
