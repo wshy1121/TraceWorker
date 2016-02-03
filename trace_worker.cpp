@@ -406,9 +406,21 @@ int CTraceWorkManager::getSessionId(bool enabl)
 
 int CTraceWorkManager::dealPacket(char *packet, int packetLen, CLogDataInf &dataInf)
 {
+	char sendData[16];
+	int sendDataLen = 0;
+	unsigned int strLenNum = packetLen + 12;
+	
+	memcpy(sendData+sendDataLen, (char *)"\x7B\x7B\x7B\x7B", 4);
+	sendDataLen += 4;
+	memcpy(sendData+sendDataLen, &strLenNum, sizeof(int));
+	sendDataLen += sizeof(int);
+	
 	CBase::pthread_mutex_lock(&socketMutex);
-	g_trace->send(packet, packetLen);
-	g_trace->receiveInfData(&dataInf);	
+	send(sendData, sendDataLen);
+	send(packet, packetLen);
+	send((char *)"\x7D\x7D\x7D\x7D", 4);
+	
+	receiveInfData(&dataInf);	
 	CBase::pthread_mutex_unlock(&socketMutex);
 	return 0;
 }

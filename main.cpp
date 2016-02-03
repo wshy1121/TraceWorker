@@ -53,25 +53,25 @@ void* test1(void *pArg)
 	{
 		trace_worker();
 		fun0(100);
-		CBase::usleep(1000*1000);
+		//CBase::usleep(1000*1000);
 	}
 	return NULL;
 }
 
-int main()
+int main1()
 {
-	trace_start("127.0.0.1", 8889, "../Log/TraceWorkerDebug.cpp");
+	trace_start("127.0.0.1", 880110, "/root/nfs/Log/TraceWorkerDebug.cpp");
 	{
+		//trace_worker();
 		fun0(5);
 		
 	}
-	return 0;
-	while (1)
+	//return 0;
+	for (int i=0; i<10000; ++i)
 	{
 		{
 			trace_worker();
 			fun0(5);
-			//CBase::usleep(100);
 		}
 	}
 	return 0;
@@ -80,15 +80,13 @@ int main()
 
 
 
-int testThreads()
+int main()
 {
-	char str[4096];
-
 	int dataLen = sizeof(testData);
 	memset(testData, 'A', dataLen);
 	testData[dataLen-1] = '\n';
 	
-	trace_start("127.0.0.1", 8889, "TraceWorkerDebug.cpp");
+	trace_start("127.0.0.1", 880110, "/root/nfs/Log/TraceWorkerDebug.cpp");
 	const int threadNum = 10;
 	CBase::pthread_t thread_id[threadNum];	
 
