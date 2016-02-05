@@ -11,6 +11,7 @@ typedef int SOCKET;
 #include <map>
 #include "trace_worker.h"
 #include "trace_base.h"
+#include "trace_packet.h"
 
 class CTraceWorkManager
 {

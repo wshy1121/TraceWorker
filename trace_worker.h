@@ -15,7 +15,6 @@ typedef int SOCKET;
 #include <stdio.h>
 #ifdef __cplusplus
 #include <string>
-#include "trace_packet.h"
 
 
 class CCandy
