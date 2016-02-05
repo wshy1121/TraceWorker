@@ -535,7 +535,7 @@ void CTraceWorkManager::InsertHex(int line, char *file_name, char *psBuf, int nB
 
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
-	g_trace->dealPacket(packet, packetLen, dataInf);
+	dealPacket(packet, packetLen, dataInf);
 	return ;
 }
 
@@ -629,7 +629,7 @@ void CTraceWorkManager::InsertTrace(int line, char *file_name, const char *forma
 	
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
-	g_trace->dealPacket(packet, packetLen, dataInf);
+	dealPacket(packet, packetLen, dataInf);
 }
 
 

@@ -23,6 +23,16 @@ CBase::pthread_t CBase::pthread_self(void)
 
 }
 
+int CBase::pthread_join(pthread_t thread, void **retval)
+{
+#ifdef WIN32
+	assert(0);
+	return 0;
+#else
+	return ::pthread_join(thread, retval);
+#endif
+}
+
 int CBase::vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {
 	return ::vsnprintf(str, size, format, ap);
@@ -68,6 +78,16 @@ int CBase::pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t 
 	return ::pthread_mutex_init(mutex, attr);
 #endif
 
+}
+
+int CBase::pthread_mutex_trylock(pthread_mutex_t *mutex)
+{
+#ifdef WIN32
+	assert(0);
+	return 0;
+#else
+	return ::pthread_mutex_trylock(mutex);
+#endif
 }
 
 int CBase::pthread_mutex_lock(pthread_mutex_t *mutex)

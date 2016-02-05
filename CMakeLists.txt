@@ -26,6 +26,10 @@ SET(SRC_SRCS
   trace_worker.cpp
   trace_packet.cpp
   trace_base.cpp
+  thread_queue.cpp
+  link_tool.cpp
+  wrap_malloc.cpp
+  mem_base.cpp
 )
 
 # shared library
