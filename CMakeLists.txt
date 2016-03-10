@@ -30,6 +30,7 @@ SET(SRC_SRCS
   link_tool.cpp
   wrap_malloc.cpp
   mem_base.cpp
+  socket_opr.cpp
 )
 
 # shared library

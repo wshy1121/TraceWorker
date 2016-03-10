@@ -12,6 +12,7 @@ typedef int SOCKET;
 #include "trace_worker.h"
 #include "trace_base.h"
 #include "trace_packet.h"
+#include "socket_opr.h"
 
 class CTraceWorkManager
 {
@@ -288,7 +289,14 @@ bool CTraceWorkManager::startServer(const char *sip, int sport, const char *file
 	{
 		return false;
 	}
-	openFile(fileName);
+
+    std::string fileNameStr = fileName;
+    std::string::size_type nameIndex = fileNameStr.find_last_of('/');
+    std::string localIp = "/" + CSocketOpr::instance()->localHostIp();
+
+    fileNameStr = fileNameStr.insert(nameIndex, localIp);
+    
+	openFile(fileNameStr.c_str());
 	return true;
 }
 
@@ -327,6 +335,7 @@ void CTraceWorkManager::openFile(const char *fileName)
 	dataInf.putInf("");
 	dataInf.putInf("0");
 	dataInf.putInf((char *)fileName);
+    
 
 	char *packet = NULL;
 	int packetLen = dataInf.packet(packet);
