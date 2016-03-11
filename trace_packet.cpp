@@ -16,7 +16,7 @@ CLogDataInf::~CLogDataInf()
 {
 	if (m_packet)
 	{
-		free(m_packet);
+		delete []m_packet;
 		m_packet = NULL;
 	}
 }

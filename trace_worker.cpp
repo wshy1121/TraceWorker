@@ -289,14 +289,8 @@ bool CTraceWorkManager::startServer(const char *sip, int sport, const char *file
 	{
 		return false;
 	}
-
-    std::string fileNameStr = fileName;
-    std::string::size_type nameIndex = fileNameStr.find_last_of('/');
-    std::string localIp = "/" + CSocketOpr::instance()->localHostIp();
-
-    fileNameStr = fileNameStr.insert(nameIndex, localIp);
     
-	openFile(fileNameStr.c_str());
+	openFile(fileName);
 	return true;
 }
 
