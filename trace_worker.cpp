@@ -13,6 +13,7 @@ typedef int SOCKET;
 #include "trace_base.h"
 #include "trace_packet.h"
 #include "socket_opr.h"
+#include <sys/ioctl.h>
 
 class CTraceWorkManager
 {
@@ -346,6 +347,9 @@ int CTraceWorkManager::connect(const char *sip, int port)
 		return -1;
 	}
 
+	unsigned long block = 1;
+	ioctl(socketClient,FIONBIO,&block);
+
 	struct sockaddr_in addr;
 	addr.sin_family 		= AF_INET;
 	addr.sin_addr.s_addr	= inet_addr(sip);
@@ -354,7 +358,29 @@ int CTraceWorkManager::connect(const char *sip, int port)
 	int ret = ::connect(socketClient, (struct sockaddr *) & addr, sizeof(sockaddr_in));
 	if(-1 == ret)
 	{
-		return -1;
+		int maxFd = socketClient + 1;
+		struct timeval timeOut;
+		timeOut.tv_sec = 1;
+		timeOut.tv_usec = 0;
+		fd_set writeFds;
+		FD_ZERO(&writeFds);
+		FD_SET(socketClient,&writeFds);
+		if(select(maxFd,NULL,&writeFds,NULL,&timeOut) <= 0 )
+		{
+			close(socketClient);
+			socketClient = -1;
+			return false;
+		}
+
+		int error = -1;
+		socklen_t len = sizeof(int);
+		getsockopt(socketClient,SOL_SOCKET,SO_ERROR,&error,&len);
+		if( 0 != error )
+		{
+			close(socketClient);
+			socketClient = -1;
+			return false;
+		}
 	}
 	m_sip = sip;
 	m_port = port;
