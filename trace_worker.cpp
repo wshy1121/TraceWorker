@@ -360,8 +360,8 @@ int CTraceWorkManager::connect(const char *sip, int port)
 	{
 		int maxFd = socketClient + 1;
 		struct timeval timeOut;
-		timeOut.tv_sec = 1;
-		timeOut.tv_usec = 0;
+		timeOut.tv_sec = 0;
+		timeOut.tv_usec = 10000;
 		fd_set writeFds;
 		FD_ZERO(&writeFds);
 		FD_SET(socketClient,&writeFds);
@@ -521,17 +521,16 @@ int CTraceWorkManager::send(char *szText,int len)
 	while(cnt>0)
 	{	
 		rc=::send(m_socketClient,szText,cnt,0);
-		if(rc==-1)
+		if(rc == -1)
 		{
-			m_socketClient = -1;
-			return -1;
+            continue;
 		}
-		if(rc==0)
-		{
+		if(rc == 0)
+		{   printf("send Data Err  len-cnt  %d\n", len-cnt);
 			return len-cnt;
 		}
-		szText+=rc;
-		cnt-=rc;
+		szText += rc;
+		cnt -= rc;
 	}
 	return len;
 }
