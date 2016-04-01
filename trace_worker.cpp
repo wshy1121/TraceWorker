@@ -472,14 +472,19 @@ bool CTraceWorkManager::receiveInfData(CLogDataInf *pDataInf)
 	int iLen = 0;		
 	pDataInf->C2ILen(CLen,ClenSize,iLen);
 
-	char *packet = new char[iLen];
+	char packet[512];
+    if (iLen > sizeof(packet))
+    {
+        printf("receiveInfData iLen is too long %d\n", iLen);
+        return false;
+    }
 	memcpy(packet, CLen, ClenSize);
 	if (receive(packet+ClenSize, iLen-ClenSize) <= 0)
 	{
 		return false;
 	}
 	pDataInf->unPacket(packet);
-    delete []packet;
+
 	return true;
 }
 
