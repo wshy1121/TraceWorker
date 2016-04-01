@@ -7,7 +7,7 @@
 class CLogDataInf
 {
 public:
-	CLogDataInf();
+	CLogDataInf(bool isCopy = true);
 	~CLogDataInf();
 	void putInf(const char *strdata);
 	void putInf(char *strdata);	
@@ -26,6 +26,7 @@ public:
 	char *m_packet;
 	int m_packetLen;
 	int m_infsNum;
+    bool m_isCopy;
 };
 
 

@@ -7,14 +7,18 @@
 
 int CLogDataInf::m_lenSize = 4;
 
-CLogDataInf::CLogDataInf() : m_packet(NULL), m_packetLen(0), m_infsNum(0)
+CLogDataInf::CLogDataInf(bool isCopy)
+:m_packet(NULL)
+,m_packetLen(0)
+,m_infsNum(0)
+,m_isCopy(true)
 {
 }
 
 
 CLogDataInf::~CLogDataInf()
 {
-	if (m_packet)
+	if (m_packet && m_isCopy)
 	{
 		delete []m_packet;
 		m_packet = NULL;
@@ -75,12 +79,13 @@ int CLogDataInf::packet()
 
 int CLogDataInf::packet(char *&packet)
 {
-	if (m_packet)
+	if (m_packet && m_isCopy)
 	{
-		free(m_packet);
+		delete []m_packet;
 	}
+    m_isCopy = true;
 	int mallocLen = m_lenSize + m_packetLen + m_lenSize;
-	m_packet = (char *)malloc(mallocLen);
+	m_packet = new char[mallocLen];
 
 	int pos = 0;
 	I2CLen(mallocLen, m_packet+pos, m_lenSize);
@@ -105,7 +110,15 @@ int CLogDataInf::packet(char *&packet)
 }
 int CLogDataInf::unPacket(char *packet)
 {
-	m_packet = packet;
+    m_packet = packet;
+    if (m_isCopy)
+    {
+        int packetLen = 0;
+        C2ILen(packet, m_lenSize, packetLen);
+        m_packet = new char[packetLen];
+        memcpy(m_packet, packet, packetLen);
+    }
+    
 	return unPacket(m_packet, m_infs, m_infLens);
 }
 
