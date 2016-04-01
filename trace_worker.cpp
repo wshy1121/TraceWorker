@@ -473,7 +473,7 @@ bool CTraceWorkManager::receiveInfData(CLogDataInf *pDataInf)
 	pDataInf->C2ILen(CLen,ClenSize,iLen);
 
 	char packet[512];
-    if (iLen > sizeof(packet))
+    if (iLen > (int)sizeof(packet))
     {
         printf("receiveInfData iLen is too long %d\n", iLen);
         return false;
