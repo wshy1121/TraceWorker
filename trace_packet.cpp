@@ -110,13 +110,20 @@ int CLogDataInf::packet(char *&packet)
 }
 int CLogDataInf::unPacket(char *packet)
 {
-    m_packet = packet;
     if (m_isCopy)
     {
+        if (m_packet)
+        {
+            delete []m_packet;
+        }
         int packetLen = 0;
         C2ILen(packet, m_lenSize, packetLen);
         m_packet = new char[packetLen];
         memcpy(m_packet, packet, packetLen);
+    }
+    else
+    {
+        m_packet = packet;
     }
     
 	return unPacket(m_packet, m_infs, m_infLens);

@@ -479,7 +479,7 @@ bool CTraceWorkManager::receiveInfData(CLogDataInf *pDataInf)
 		return false;
 	}
 	pDataInf->unPacket(packet);
-
+    delete []packet;
 	return true;
 }
 
