@@ -523,17 +523,18 @@ int CTraceWorkManager::send(char *szText,int len)
 	int cnt;
 	int rc;
 	cnt=len;
+    int tryTime = 0;
 	while(cnt>0)
-	{	
+	{  
 		rc=::send(m_socketClient,szText,cnt,0);
-		if(rc == -1)
+		if(rc <= 0)
 		{
 		    CBase::usleep(1000);
-            continue;
-		}
-		if(rc == 0)
-		{   printf("send Data Err  len-cnt  %d\n", len-cnt);
-            CBase::usleep(1000);
+		    printf("send Data Err tryTime %d\n", tryTime);            
+            if (++tryTime == 1000)
+            {
+                break;
+            }
             continue;
 		}
 		szText += rc;
