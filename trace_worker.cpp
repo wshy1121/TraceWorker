@@ -528,11 +528,13 @@ int CTraceWorkManager::send(char *szText,int len)
 		rc=::send(m_socketClient,szText,cnt,0);
 		if(rc == -1)
 		{
+		    CBase::usleep(1000);
             continue;
 		}
 		if(rc == 0)
 		{   printf("send Data Err  len-cnt  %d\n", len-cnt);
-			return len-cnt;
+            CBase::usleep(1000);
+            continue;
 		}
 		szText += rc;
 		cnt -= rc;
