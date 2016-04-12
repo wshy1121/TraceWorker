@@ -529,8 +529,13 @@ int CTraceWorkManager::send(char *szText,int len)
 		rc=::send(m_socketClient,szText,cnt,0);
 		if(rc <= 0)
 		{
+		    if (errno == ECONNRESET)
+            {
+                m_socketClient= -1;
+                printf("ECONNRESET  %d\n", errno);
+                break;
+            }      
 		    CBase::usleep(1000);
-		    printf("send Data Err tryTime %d\n", tryTime);            
             if (++tryTime == 1000)
             {
                 break;
