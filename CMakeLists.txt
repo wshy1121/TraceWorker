@@ -31,6 +31,7 @@ SET(SRC_SRCS
   wrap_malloc.cpp
   mem_base.cpp
   socket_opr.cpp
+  ConvertUTF.cpp
 )
 
 # shared library
@@ -48,7 +49,7 @@ ENDIF (WIN32)
 
 ADD_EXECUTABLE(test ${SRC_SRCS} main.cpp)
 # link library
-TARGET_LINK_LIBRARIES(test TraceWorker pthread)
+TARGET_LINK_LIBRARIES(test  pthread)
 
 # clean
 SET_TARGET_PROPERTIES(TraceWorker PROPERTIES CLEAN_DIRECT_OUTPUT 1)

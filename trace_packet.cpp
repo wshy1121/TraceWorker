@@ -152,7 +152,7 @@ int CLogDataInf::unPacket(char *packet, char *infs[], int infLens[])
 		m_infsNum = 0;
 	}
 	infs[m_infsNum] = NULL;
-	infLens[m_infsNum] = NULL;
+	infLens[m_infsNum] = 0;
 	return m_packetLen;
 }
 

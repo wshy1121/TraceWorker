@@ -14,6 +14,7 @@ typedef int SOCKET;
 #include "trace_packet.h"
 #include "socket_opr.h"
 #include <sys/ioctl.h>
+#include "SimpleIni.h"
 
 class CTraceWorkManager
 {
@@ -38,6 +39,7 @@ private:
 	bool receiveInfData(CLogDataInf *pDataInf);
 	int receive(char *szText,int iLen);
 	int send(char *szText,int len);	
+    bool getServerInf(std::string &ip, int &port);
 private:	
 	const char *m_sip;
 	int m_port;
@@ -285,15 +287,51 @@ bool CTraceWorkManager::startServer(const char *sip, int sport, const char *file
 
 	int serverPort = sport;
 	CBase::pthread_mutex_init(&socketMutex, NULL);
-	m_socketClient = connect(sip, serverPort);
-	if(-1 == m_socketClient)
-	{
-		return false;
-	}
-    
+
+    std::string serIp;
+    int serPort = 0;
+    bool bRet = getServerInf(serIp, serPort);
+    if (bRet == true)
+    {
+        m_socketClient = connect(serIp.c_str(), serPort);
+        if(-1 == m_socketClient)
+        {
+            m_socketClient = connect(sip, serverPort);
+            if(-1 == m_socketClient)
+            {
+                return false;
+            }
+        }   
+    }
+    else
+    {
+        m_socketClient = connect(sip, serverPort);
+        if(-1 == m_socketClient)
+        {
+            return false;
+        }
+    }
 	openFile(fileName);
 	return true;
 }
+
+bool CTraceWorkManager::getServerInf(std::string &ip, int &port)
+{
+    CSimpleIniA ini;  
+    ini.SetUnicode();  
+    SI_Error ret = ini.LoadFile("TraceCfg.ini");
+    if (ret != SI_OK)
+    {
+        return false;
+    }
+    
+    const char *netCliIp = ini.GetValue("NetConfig", "SerIp", "192.168.0.1");  
+    int netCliPort = (int)ini.GetLongValue("NetConfig", "SerPort", 0);
+    ip = netCliIp;
+    port = netCliPort;
+    return true;
+}
+
 
 bool CTraceWorkManager::isStarted()
 {
@@ -369,7 +407,7 @@ int CTraceWorkManager::connect(const char *sip, int port)
 		{
 			close(socketClient);
 			socketClient = -1;
-			return false;
+			return -1;
 		}
 
 		int error = -1;
@@ -379,7 +417,7 @@ int CTraceWorkManager::connect(const char *sip, int port)
 		{
 			close(socketClient);
 			socketClient = -1;
-			return false;
+			return -1;
 		}
 	}
 	m_sip = sip;
@@ -531,7 +569,7 @@ int CTraceWorkManager::send(char *szText,int len)
 		{
 		    if (errno == ECONNRESET)
             {
-                m_socketClient= -1;
+                m_socketClient = -1;
                 printf("ECONNRESET  %d\n", errno);
                 break;
             }      
