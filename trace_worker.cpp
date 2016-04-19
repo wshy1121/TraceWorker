@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <string.h>
+#include<linux/tcp.h>
 typedef int SOCKET;
 #endif
 #include <map>
@@ -384,6 +385,13 @@ int CTraceWorkManager::connect(const char *sip, int port)
 	{
 		return -1;
 	}
+
+    const char chOpt = 1;
+    int iErr = setsockopt(socketClient, IPPROTO_TCP, TCP_NODELAY, &chOpt, sizeof(char));
+    if (iErr == -1)
+    {
+        return -1;
+    }
 
 	unsigned long block = 1;
 	ioctl(socketClient,FIONBIO,&block);
