@@ -386,13 +386,6 @@ int CTraceWorkManager::connect(const char *sip, int port)
 		return -1;
 	}
 
-    const char chOpt = 1;
-    int iErr = setsockopt(socketClient, IPPROTO_TCP, TCP_NODELAY, &chOpt, sizeof(char));
-    if (iErr == -1)
-    {
-        return -1;
-    }
-
 	unsigned long block = 1;
 	ioctl(socketClient,FIONBIO,&block);
 
@@ -430,6 +423,14 @@ int CTraceWorkManager::connect(const char *sip, int port)
 	}
 	m_sip = sip;
 	m_port = port;
+
+    int no_delay = 1;
+    int iErr = setsockopt(socketClient, IPPROTO_TCP, TCP_NODELAY, &no_delay, sizeof(no_delay));
+    if (iErr == -1)
+    {
+        printf("set no_delay failed\n");
+        return -1;
+    }
 	return socketClient;
 }
 
