@@ -576,10 +576,10 @@ int CTraceWorkManager::send(char *szText,int len)
 		rc=::send(m_socketClient,szText,cnt,0);
 		if(rc <= 0)
 		{
-		    if (errno == ECONNRESET)
+		    if (errno == ECONNRESET || errno == EPIPE)
             {
                 m_socketClient = -1;
-                printf("ECONNRESET  %d\n", errno);
+                printf("ECONNRESET  || EPIPE  %d\n", errno);
                 break;
             }      
 		    CBase::usleep(1000);
