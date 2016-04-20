@@ -19,6 +19,7 @@ public:
 	int getPacket(char *&packet);
 	void I2CLen(int iLen, char *CLen, int CLenSize);
 	void C2ILen(char *CLen, int CLenSize, int &iLen);
+    int getPkLen();
 public:
 	static int m_lenSize;	
 	char *m_infs[INF_SIZE];

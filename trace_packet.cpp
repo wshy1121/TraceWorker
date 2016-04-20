@@ -11,7 +11,7 @@ CLogDataInf::CLogDataInf(bool isCopy)
 :m_packet(NULL)
 ,m_packetLen(0)
 ,m_infsNum(0)
-,m_isCopy(true)
+,m_isCopy(isCopy)
 {
 }
 
@@ -79,13 +79,19 @@ int CLogDataInf::packet()
 
 int CLogDataInf::packet(char *&packet)
 {
-	if (m_packet && m_isCopy)
-	{
-		delete []m_packet;
-	}
-    m_isCopy = true;
-	int mallocLen = m_lenSize + m_packetLen + m_lenSize;
-	m_packet = new char[mallocLen];
+    int mallocLen = m_lenSize + m_packetLen + m_lenSize;
+    if (m_isCopy)
+    {
+        if (m_packet)
+        {
+            delete []m_packet;
+        }
+    	m_packet = new char[mallocLen];
+    }
+    else
+    {
+        m_packet = packet;
+    }
 
 	int pos = 0;
 	I2CLen(mallocLen, m_packet+pos, m_lenSize);
@@ -166,4 +172,8 @@ int CLogDataInf::getPacket(char *&packet)
 	return m_lenSize + m_packetLen + m_lenSize;
 }
 
+int CLogDataInf::getPkLen()
+{
+    return m_lenSize + m_packetLen + m_lenSize;
+}
 

@@ -23,7 +23,7 @@ public:
 	static CTraceWorkManager *instance();
 	bool startServer(const char *sip, int sport, const char *fileName);
 	bool isStarted();
-	int dealPacket(char *packet, int packetLen, CLogDataInf &dataInf);
+	int dealPacket(CLogDataInf &sendDataInf, CLogDataInf &recvDataInf);
 	void InsertHex(int line, char *file_name, char *psBuf, int nBufLen);
 	void packetHex(char *psBuf, int nBufLen, char *str, int strLen);
 	void InsertTrace(int line, char *file_name, const char *format, va_list ap);
@@ -73,7 +73,7 @@ CCandy::CCandy(int line, char *file_name, char *func_name, int pre_line, char *p
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 	CBase::snprintf(sLevel, sizeof(sLevel), "%d", display_level);
 	
-	CLogDataInf dataInf;
+	CLogDataInf dataInf(false);
 	dataInf.putInf((char *)"createCandy");
 	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
@@ -89,9 +89,7 @@ CCandy::CCandy(int line, char *file_name, char *func_name, int pre_line, char *p
 	dataInf.putInf(pre_file_name);
 	dataInf.putInf(pre_func_name);
 	
-	char *packet = NULL;
-	int packetLen = dataInf.packet(packet);
-	g_trace->dealPacket(packet, packetLen, dataInf);
+	g_trace->dealPacket(dataInf, dataInf);
 	return ;
 }
 
@@ -108,7 +106,7 @@ CCandy::~CCandy()
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", m_line);
-	CLogDataInf dataInf;
+	CLogDataInf dataInf(false);
 	dataInf.putInf((char *)"destroyCandy");
 	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
@@ -118,9 +116,7 @@ CCandy::~CCandy()
 	dataInf.putInf("0");
 	dataInf.putInf("");
 	
-	char *packet = NULL;
-	int packetLen = dataInf.packet(packet);
-	g_trace->dealPacket(packet, packetLen, dataInf);
+	g_trace->dealPacket(dataInf, dataInf);
 	return ;
 }
 
@@ -151,7 +147,7 @@ void CBugKiller::DispAll()
 	char sTid[16];	
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
-	CLogDataInf dataInf;
+	CLogDataInf dataInf(false);
 	dataInf.putInf((char *)"dispAll");
 	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
@@ -161,9 +157,7 @@ void CBugKiller::DispAll()
 	dataInf.putInf("0");
 	dataInf.putInf("backtrace");
 
-	char *packet = NULL;
-	int packetLen = dataInf.packet(packet);
-	g_trace->dealPacket(packet, packetLen, dataInf);
+	g_trace->dealPacket(dataInf, dataInf);
 	return ;	
 }
 
@@ -188,7 +182,7 @@ void CBugKiller::InsertTag(int line, char *file_name, const char* fmt, ...)
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 
-	CLogDataInf dataInf;
+	CLogDataInf dataInf(false);
 	dataInf.putInf((char *)"insertTag");
 	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
@@ -198,9 +192,7 @@ void CBugKiller::InsertTag(int line, char *file_name, const char* fmt, ...)
 	dataInf.putInf("0");
 	dataInf.putInf(content);
 
-	char *packet = NULL;
-	int packetLen = dataInf.packet(packet);
-	g_trace->dealPacket(packet, packetLen, dataInf);
+	g_trace->dealPacket(dataInf, dataInf);
 	return ;
 }
 
@@ -215,7 +207,7 @@ void CBugKiller::printfMemInfMap()
 	char sTid[16];	
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
-	CLogDataInf dataInf;
+	CLogDataInf dataInf(false);
 	dataInf.putInf((char *)"printfMemInfMap");
 	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
@@ -226,9 +218,7 @@ void CBugKiller::printfMemInfMap()
 	dataInf.putInf("");
 
 	
-	char *packet = NULL;
-	int packetLen = dataInf.packet(packet);
-	g_trace->dealPacket(packet, packetLen, dataInf);
+	g_trace->dealPacket(dataInf, dataInf);
 	return ;	
 }
 
@@ -360,7 +350,7 @@ void CTraceWorkManager::openFile(const char *fileName)
 	char sTid[16];
 	CBase::snprintf(sSid, sizeof(sSid), "%d", g_trace->getSessionId());
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
-	CLogDataInf dataInf;
+	CLogDataInf dataInf(false);
 	dataInf.putInf((char *)"openFile");
 	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
@@ -371,9 +361,7 @@ void CTraceWorkManager::openFile(const char *fileName)
 	dataInf.putInf((char *)fileName);
     
 
-	char *packet = NULL;
-	int packetLen = dataInf.packet(packet);
-	dealPacket(packet, packetLen, dataInf);
+	dealPacket(dataInf, dataInf);
 	m_fileName = fileName;
 	return ;	
 }
@@ -481,24 +469,46 @@ int CTraceWorkManager::getSessionId(bool enabl)
 	return ++m_sessionId;
 }
 
-int CTraceWorkManager::dealPacket(char *packet, int packetLen, CLogDataInf &dataInf)
+int CTraceWorkManager::dealPacket(CLogDataInf &sendDataInf, CLogDataInf &recvDataInf)
 {
-	char sendData[16];
-	int sendDataLen = 0;
+    int headLen = 4 + sizeof(int);
+    int tailLen = 4;
+    
+    int newLen = sendDataInf.getPkLen();
+    char *sendBuffer = new char[newLen + headLen + tailLen];
+    int sendBufferLen = 0;
+    
+    char *packet = sendBuffer+headLen;
+    int packetLen = sendDataInf.packet(packet);
+    if (newLen != packetLen)
+    {
+        printf("dealPacket failed  newLen != packetLen %d  %d\n", newLen, packetLen);
+        delete []sendBuffer;
+        return -1;
+    }
+
+	char *headData = sendBuffer;
+	int headDataLen = 0;
+    
 	unsigned int strLenNum = packetLen + 12;
-	
-	memcpy(sendData+sendDataLen, (char *)"\x7B\x7B\x7B\x7B", 4);
-	sendDataLen += 4;
-	memcpy(sendData+sendDataLen, &strLenNum, sizeof(int));
-	sendDataLen += sizeof(int);
-	
+	memcpy(headData+headDataLen, (char *)"\x7B\x7B\x7B\x7B", 4);
+	headDataLen += 4;
+	memcpy(headData+headDataLen, &strLenNum, sizeof(int));
+	headDataLen += sizeof(int);
+
+    char *tailData = sendBuffer + headLen + packetLen;
+    int tailDataLen = 0;
+    memcpy(tailData, "\x7D\x7D\x7D\x7D", 4);
+    tailDataLen += 4;
+
+    sendBufferLen = headDataLen + packetLen + tailDataLen;
+    
 	CBase::pthread_mutex_lock(&socketMutex);
-	send(sendData, sendDataLen);
-	send(packet, packetLen);
-	send((char *)"\x7D\x7D\x7D\x7D", 4);
-	
-	receiveInfData(&dataInf);	
+	send(sendBuffer, sendBufferLen);
+	receiveInfData(&recvDataInf);	
 	CBase::pthread_mutex_unlock(&socketMutex);
+    
+    delete []sendBuffer;
 	return 0;
 }
 
@@ -612,7 +622,7 @@ void CTraceWorkManager::InsertHex(int line, char *file_name, char *psBuf, int nB
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 
-	CLogDataInf dataInf;
+	CLogDataInf dataInf(false);
 	dataInf.putInf((char *)"insertTrace");
 	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
@@ -622,9 +632,7 @@ void CTraceWorkManager::InsertHex(int line, char *file_name, char *psBuf, int nB
 	dataInf.putInf("0");
 	dataInf.putInf(str);
 
-	char *packet = NULL;
-	int packetLen = dataInf.packet(packet);
-	dealPacket(packet, packetLen, dataInf);
+	dealPacket(dataInf, dataInf);
 	return ;
 }
 
@@ -706,7 +714,7 @@ void CTraceWorkManager::InsertTrace(int line, char *file_name, const char *forma
 	CBase::snprintf(sTid, sizeof(sTid), "%d", CBase::pthread_self());
 	CBase::snprintf(sLine, sizeof(sLine), "%d", line);
 	
-	CLogDataInf dataInf;
+	CLogDataInf dataInf(false);
 	dataInf.putInf((char *)"insertTrace");
 	dataInf.putInf(sSid);
 	dataInf.putInf(sTid);
@@ -716,9 +724,7 @@ void CTraceWorkManager::InsertTrace(int line, char *file_name, const char *forma
 	dataInf.putInf("0");
 	dataInf.putInf(content);
 	
-	char *packet = NULL;
-	int packetLen = dataInf.packet(packet);
-	dealPacket(packet, packetLen, dataInf);
+	dealPacket(dataInf, dataInf);
 }
 
 
