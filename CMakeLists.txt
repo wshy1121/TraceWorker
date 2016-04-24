@@ -16,11 +16,7 @@ ELSEIF(APPLE)
     #do something related to APPLE
 ENDIF (WIN32)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -g -Wall -fPIC -O0")
-else()
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -O2 -Wall -fPIC")
-endif()
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -g -Wall -fPIC -O0")
 
 SET(SRC_SRCS
   trace_worker.cpp
