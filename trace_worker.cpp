@@ -10,12 +10,21 @@
 typedef int SOCKET;
 #endif
 #include <map>
+#include <sys/ioctl.h>
+#include <assert.h>
 #include "trace_worker.h"
 #include "trace_base.h"
 #include "trace_packet.h"
 #include "socket_opr.h"
-#include <sys/ioctl.h>
 #include "SimpleIni.h"
+#include "link_tool.h"
+typedef struct TraceDeep
+{
+    CBase::pthread_t tid;
+	int deep;
+	node Node;
+}TraceDeep;
+#define TraceDeepContain(x) container_of((x), TraceDeep, Node)
 
 class CTraceWorkManager
 {
@@ -33,6 +42,7 @@ public:
 	static void ctrl_c_func(int signo);
 private:
 	CTraceWorkManager(); 
+	~CTraceWorkManager(); 
 	void openFile(const char *fileName);
 	int connect(const char *sip, int port);
 	int disConnect(int socket);	
@@ -41,6 +51,13 @@ private:
 	int receive(char *szText,int iLen);
 	int send(char *szText,int len);	
     bool getServerInf(std::string &ip, int &port);
+    
+    void createCandy();
+    void destroyCandy();
+    void removeTraceDeep(TraceDeep *traceDeep);
+    void destroyTraceDeep(TraceDeep *traceDeep);
+    TraceDeep *getTraceDeep(CBase::pthread_t tid);
+    TraceDeep *creatTraceDeep(CBase::pthread_t tid);
 private:	
 	const char *m_sip;
 	int m_port;
@@ -49,6 +66,8 @@ private:
 	CBase::pthread_mutex_t socketMutex;
 	int m_sessionId;
 	const int m_maxSessionId;
+    base::CList *m_pThreadList;
+    CBase::pthread_mutex_t m_threadListMutex;
 	static CTraceWorkManager _instance;
 };
 
@@ -256,17 +275,26 @@ int CBugKiller::reStart()
 }
 
 CTraceWorkManager CTraceWorkManager::_instance;
-CTraceWorkManager::CTraceWorkManager():m_socketClient(-1), m_sessionId(1), m_maxSessionId(1024*1024)
-{
-#ifdef WIN32	
-		WSADATA wsa={0};
-		WSAStartup(MAKEWORD(2,2),&wsa);
-#endif
-}
-
 CTraceWorkManager *CTraceWorkManager::instance()
 {
 	return &_instance;
+}
+
+CTraceWorkManager::CTraceWorkManager():m_socketClient(-1), m_sessionId(1), m_maxSessionId(1024*1024)
+{
+    m_pThreadList = base::CList::createCList();
+    CBase::pthread_mutex_init(&socketMutex, NULL);
+    CBase::pthread_mutex_init(&m_threadListMutex, NULL);
+#ifdef WIN32	
+	WSADATA wsa={0};
+	WSAStartup(MAKEWORD(2,2),&wsa);
+#endif
+}
+
+CTraceWorkManager::~CTraceWorkManager()
+{
+    base::CList::destroyClist(m_pThreadList);
+	m_pThreadList = NULL;
 }
 
 bool CTraceWorkManager::startServer(const char *sip, int sport, const char *fileName)
@@ -277,7 +305,7 @@ bool CTraceWorkManager::startServer(const char *sip, int sport, const char *file
 	}
 
 	int serverPort = sport;
-	CBase::pthread_mutex_init(&socketMutex, NULL);
+	
 
     std::string serIp;
     int serPort = 0;
@@ -469,6 +497,20 @@ int CTraceWorkManager::getSessionId(bool enabl)
 	return ++m_sessionId;
 }
 
+bool cmpTraceDeep(node *node1, node *node2)
+{
+	TraceDeep *tmpNode1 = TraceDeepContain(node1);
+	TraceDeep *tmpNode2 = TraceDeepContain(node2);
+	if (tmpNode1->tid == tmpNode2->tid)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 int CTraceWorkManager::dealPacket(CLogDataInf &sendDataInf, CLogDataInf &recvDataInf)
 {
     int headLen = 4 + sizeof(int);
@@ -509,6 +551,16 @@ int CTraceWorkManager::dealPacket(CLogDataInf &sendDataInf, CLogDataInf &recvDat
 	CBase::pthread_mutex_unlock(&socketMutex);
     
     delete []sendBuffer;
+
+    char *oper = recvDataInf.m_infs[0];
+    if (strcmp(oper, "createCandy") == 0)
+    {
+        createCandy();
+    }
+    else if (strcmp(oper, "destroyCandy") == 0)
+    {
+        destroyCandy();
+    }
 	return 0;
 }
 
@@ -742,6 +794,90 @@ std::string &CTraceWorkManager::getBackTrace(std::string &backTrace)
 		backTrace += tmp;
 	}
 	return backTrace;
+}
+
+
+void CTraceWorkManager::createCandy()
+{
+    TraceDeep *traceDeep = creatTraceDeep(CBase::pthread_self());
+    traceDeep->deep++;
+    return ;
+}
+
+void CTraceWorkManager::destroyCandy()
+{
+    TraceDeep *traceDeep = getTraceDeep(CBase::pthread_self());
+    if(traceDeep)
+    {
+        traceDeep->deep--;
+        if (traceDeep->deep == 0)
+        {
+            removeTraceDeep(traceDeep);
+			destroyTraceDeep(traceDeep);
+        }
+    }
+
+    return ;
+}
+
+void CTraceWorkManager::removeTraceDeep(TraceDeep *traceDeep)
+{
+    CBase::pthread_mutex_lock(&m_threadListMutex);
+    node *pNode = m_pThreadList->find(&traceDeep->Node,cmpTraceDeep);
+    CBase::pthread_mutex_unlock(&m_threadListMutex);
+    
+	if (pNode != NULL)
+	{
+		remov_node(pNode);
+	}
+}
+
+void CTraceWorkManager::destroyTraceDeep(TraceDeep *pTraceDeep)
+{
+	base::free(pTraceDeep);
+}
+
+
+TraceDeep *CTraceWorkManager::getTraceDeep(CBase::pthread_t tid)
+{
+    TraceDeep traceDeep;    
+    traceDeep.tid = tid;
+    
+    CBase::pthread_mutex_lock(&m_threadListMutex);
+    node *pNode = m_pThreadList->find(&traceDeep.Node,cmpTraceDeep);
+    CBase::pthread_mutex_unlock(&m_threadListMutex);
+    
+    if (pNode != NULL)
+	{
+		return TraceDeepContain(pNode);
+	}
+	return NULL;
+}
+
+TraceDeep *CTraceWorkManager::creatTraceDeep(CBase::pthread_t tid)
+{
+    CBase::pthread_mutex_lock(&m_threadListMutex);
+    TraceDeep traceDeep;    
+    traceDeep.tid = tid;
+    
+    node *pNode = m_pThreadList->find(&traceDeep.Node, cmpTraceDeep);
+    TraceDeep *pTraceDeep = NULL;
+    if (pNode != NULL)//如果查找到
+	{
+		pTraceDeep = TraceDeepContain(pNode);
+	}
+	else  
+    {
+        pTraceDeep = (TraceDeep *)base::malloc(sizeof(TraceDeep));
+        assert(pTraceDeep != NULL);
+        
+        pTraceDeep->deep = 0;
+        pTraceDeep->tid = tid;
+        m_pThreadList->push_back(&pTraceDeep->Node);
+    }
+    
+    CBase::pthread_mutex_unlock(&m_threadListMutex);
+    return pTraceDeep;
 }
 
 
