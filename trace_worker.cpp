@@ -809,9 +809,23 @@ std::string &CTraceWorkManager::getBackTrace(std::string &backTrace)
 
 bool CTraceWorkManager::createCandy()
 {
+    bool isStarted = g_trace->isStarted();
     TraceDeep *traceDeep = creatTraceDeep(CBase::pthread_self());
     traceDeep->deep++;
-    return g_trace->isStarted();
+
+    if (isStarted)
+    {
+        if (traceDeep->deep == 1)
+        {
+            traceDeep->isCon = true;
+        }
+    }
+    else
+    {
+        traceDeep->isCon = false;
+    }
+    
+    return traceDeep->isCon;
 }
 
 bool CTraceWorkManager::destroyCandy()
@@ -826,9 +840,10 @@ bool CTraceWorkManager::destroyCandy()
 			destroyTraceDeep(traceDeep);
             printf("traceDeep->deep  %d\n", traceDeep->deep);
         }
+        return traceDeep->isCon;
     }
 
-    return g_trace->isStarted();
+    return false;
 }
 
 void CTraceWorkManager::removeTraceDeep(TraceDeep *traceDeep)
