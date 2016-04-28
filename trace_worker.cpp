@@ -838,7 +838,6 @@ bool CTraceWorkManager::destroyCandy()
         {
             removeTraceDeep(traceDeep);
 			destroyTraceDeep(traceDeep);
-            printf("traceDeep->deep  %d\n", traceDeep->deep);
         }
         return traceDeep->isCon;
     }
@@ -849,13 +848,12 @@ bool CTraceWorkManager::destroyCandy()
 void CTraceWorkManager::removeTraceDeep(TraceDeep *traceDeep)
 {
     CBase::pthread_mutex_lock(&m_threadListMutex);
-    node *pNode = m_pThreadList->find(&traceDeep->Node,cmpTraceDeep);
-    CBase::pthread_mutex_unlock(&m_threadListMutex);
-    
+    node *pNode = m_pThreadList->find(&traceDeep->Node,cmpTraceDeep);    
 	if (pNode != NULL)
 	{
 		m_pThreadList->erase(pNode);
-	}
+	}    
+    CBase::pthread_mutex_unlock(&m_threadListMutex);
 }
 
 void CTraceWorkManager::destroyTraceDeep(TraceDeep *pTraceDeep)
