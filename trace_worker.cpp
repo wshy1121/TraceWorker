@@ -22,6 +22,7 @@ typedef struct TraceDeep
 {
     CBase::pthread_t tid;
 	int deep;
+    bool isCon;
 	node Node;
 }TraceDeep;
 #define TraceDeepContain(x) container_of((x), TraceDeep, Node)
@@ -40,8 +41,8 @@ public:
 	int reStart();
 	int getSessionId(bool enabl = false);	
 	static void ctrl_c_func(int signo);
-    void createCandy();
-    void destroyCandy();
+    bool createCandy();
+    bool destroyCandy();
 private:
 	CTraceWorkManager(); 
 	~CTraceWorkManager(); 
@@ -79,8 +80,7 @@ static CTraceWorkManager *g_trace = CTraceWorkManager::instance();
 
 CCandy::CCandy(int line, char *file_name, char *func_name, int pre_line, char *pre_file_name, char *pre_func_name, int display_level)
 {
-    g_trace->createCandy();
-	if (!g_trace->isStarted())
+	if (!g_trace->createCandy())
 	{
 		return ;
 	}
@@ -119,8 +119,7 @@ CCandy::CCandy(int line, char *file_name, char *func_name, int pre_line, char *p
 
 CCandy::~CCandy()
 {
-    g_trace->destroyCandy();
-	if (!g_trace->isStarted())
+	if (!g_trace->destroyCandy())
 	{
 		return ;
 	}
@@ -808,14 +807,14 @@ std::string &CTraceWorkManager::getBackTrace(std::string &backTrace)
 }
 
 
-void CTraceWorkManager::createCandy()
+bool CTraceWorkManager::createCandy()
 {
     TraceDeep *traceDeep = creatTraceDeep(CBase::pthread_self());
     traceDeep->deep++;
-    return ;
+    return g_trace->isStarted();
 }
 
-void CTraceWorkManager::destroyCandy()
+bool CTraceWorkManager::destroyCandy()
 {
     TraceDeep *traceDeep = getTraceDeep(CBase::pthread_self());
     if(traceDeep)
@@ -829,7 +828,7 @@ void CTraceWorkManager::destroyCandy()
         }
     }
 
-    return ;
+    return g_trace->isStarted();
 }
 
 void CTraceWorkManager::removeTraceDeep(TraceDeep *traceDeep)
@@ -885,6 +884,7 @@ TraceDeep *CTraceWorkManager::creatTraceDeep(CBase::pthread_t tid)
         
         pTraceDeep->deep = 0;
         pTraceDeep->tid = tid;
+        pTraceDeep->isCon = false;
         m_pThreadList->push_back(&pTraceDeep->Node);
     }
     
