@@ -12,14 +12,18 @@ struct Node{
     int key,color;  
 };
 
-class Tree
+class CKey
 {
 public:
-    Tree(){  
-        nil = new Node();  
-        head = nil;  
-        nil->color = BLACK;  
-    }     
+    CKey();
+private:
+    int m_key;
+};
+
+class CRbTree
+{
+public:
+    CRbTree();
     void insert(int key);
     void remove(int key);
     void out();

@@ -7,7 +7,14 @@
 
 using namespace std;  
 
-void Tree::dfs(Node *t,int d){  
+CRbTree::CRbTree()
+{  
+    nil = new Node();  
+    head = nil;  
+    nil->color = BLACK;  
+}   
+
+void CRbTree::dfs(Node *t,int d){  
     if(t==nil)  
     {  
         //cout<<d<<" ";//到叶子结点的路径上有几个黑色结点  
@@ -20,11 +27,11 @@ void Tree::dfs(Node *t,int d){
     dfs(t->ch[1],d+(t->color==BLACK));  
     //cout<<"U";  
 }  
-void Tree::out(){  
+void CRbTree::out(){  
        dfs(head,0);cout<<endl;  
    }  
 
-void Tree::rotate(Node *t,int c){  
+void CRbTree::rotate(Node *t,int c){  
     Node *&pt = (t->p==nil) ? head : t->p->ch[t->p->ch[1]==t];// t的父亲指向t的指针  
     Node *y = t->ch[c^1];  
     t->ch[c^1] = y->ch[c];  
@@ -34,7 +41,7 @@ void Tree::rotate(Node *t,int c){
     t->p = y;  
     pt = y;  
 }  
-Node *Tree::successor(Node *t){//返回t的后继结点  
+Node *CRbTree::successor(Node *t){//返回t的后继结点  
     Node *p;  
     if(t->ch[1]!=nil){  
         p = t->ch[1];  
@@ -46,7 +53,7 @@ Node *Tree::successor(Node *t){//返回t的后继结点
         return p;  
     }  
 }  
-void Tree::insert(int key){  
+void CRbTree::insert(int key){  
     Node *t = new Node();  
     t->key = key;  
     t->ch[0] = t->ch[1] = nil;  
@@ -62,7 +69,7 @@ void Tree::insert(int key){
     else y->ch[key > y->key] = t;  
     insert_fixup(t);  
 }  
-void Tree::insert_fixup(Node *t){  
+void CRbTree::insert_fixup(Node *t){  
     while(t->p->color==RED){  
         Node *p = t->p;//父亲R  
         Node *g = p->p;//祖父B  
@@ -87,7 +94,7 @@ void Tree::insert_fixup(Node *t){
     }  
     head->color = BLACK;  
 }  
-void Tree::remove(int key)  
+void CRbTree::remove(int key) 
 {  
     Node *t= head,*y;  
     while(t!=nil&&t->key!=key) t = t->ch[key>t->key]; //查找被删除的结点  
@@ -106,7 +113,7 @@ void Tree::remove(int key)
         remove_fixup(x);  
     delete(y);  
 }  
-void Tree::remove_fixup(Node *t)  
+void CRbTree::remove_fixup(Node *t)  
 {  
     while(t!=head && t->color==BLACK){  
         Node *p = t->p;  
