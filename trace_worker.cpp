@@ -297,7 +297,6 @@ CTraceWorkManager::CTraceWorkManager()
 	WSADATA wsa={0};
 	WSAStartup(MAKEWORD(2,2),&wsa);
 #endif
-    CBase::pthread_create(&m_reConnectThread, NULL, reConThread, NULL);
 }
 
 CTraceWorkManager::~CTraceWorkManager()
@@ -324,6 +323,7 @@ bool CTraceWorkManager::startServer(const char *sip, int sport, const char *file
     }
     
 	openFile(fileName);
+    CBase::pthread_create(&m_reConnectThread, NULL, reConThread, NULL);
 	return true;
 }
 
