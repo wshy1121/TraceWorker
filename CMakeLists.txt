@@ -28,6 +28,7 @@ SET(SRC_SRCS
   mem_base.cpp
   socket_opr.cpp
   ConvertUTF.cpp
+  rb_tree.cpp
 )
 
 # shared library
