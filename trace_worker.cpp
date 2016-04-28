@@ -912,16 +912,15 @@ void* CTraceWorkManager::reConThread(void *pArg)
 }
 void CTraceWorkManager::__reConThread(void *pArg)
 {
+    int sleepTime = 3*1000*1000;
     while (1)
     {
-        CBase::usleep(1000*1000);
-        printf("m_sip.c_str(), m_port, m_fileName.c_str()  %s  %d  %s\n", m_sip.c_str(), m_port, m_fileName.c_str());
-        printf("m_socketClient %d\n", m_socketClient);
+        CBase::usleep(sleepTime);
         if (m_socketClient == -1)
-        {   printf("__LINE_, __FUNCTION__  %d  %s\n", __LINE__, __FUNCTION__);
+        {
             m_socketClient = connectServer(m_sip.c_str(), m_port);
             if (m_socketClient > 0)
-            {   printf("__LINE_, __FUNCTION__  %d  %s\n", __LINE__, __FUNCTION__);
+            {
                 openFile(m_fileName.c_str());
             }
         }
