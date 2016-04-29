@@ -6,13 +6,6 @@
 #define RED 1  
 #define BLACK 2 
 
-class CKey
-{
-public:
-    CKey();
-private:
-    int m_key;
-};
 
 template<class T>
 class CRbTree
@@ -24,7 +17,7 @@ public:
             ch[0] = ch[1] = p = NULL;  
         }  
         Node *ch[2],*p;  
-        int key;
+        T key;
         int color;  
     };
 public:
@@ -34,7 +27,7 @@ public:
         head = nil;  
         nil->color = BLACK;  
     }
-    void insert(int key)
+    void insert(T &key)
     {  
         Node *t = new Node();  
         t->key = key;  
@@ -51,7 +44,7 @@ public:
         else y->ch[key > y->key] = t;  
         insert_fixup(t);  
     }
-    void remove(int key)
+    void remove(T &key)
     {  
         Node *t= head,*y;  
         while(t!=nil&&t->key!=key) t = t->ch[key>t->key]; //查找被删除的结点  
@@ -180,7 +173,7 @@ private:
         {  
             return ;  
         }  
-        std::cout<<" "<<t->key<<" "<<(t->color==BLACK?'B':'R')<<" "<<std::endl;  
+        std::cout<<" "<<t->key.getInf()<<" "<<(t->color==BLACK?'B':'R')<<" "<<std::endl;  
         dfs(t->ch[0],d+(t->color==BLACK));  
         dfs(t->ch[1],d+(t->color==BLACK));  
     }
