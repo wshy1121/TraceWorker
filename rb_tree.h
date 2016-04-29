@@ -27,7 +27,7 @@ public:
         head = nil;  
         nil->color = BLACK;  
     }
-    void insert(T &key)
+    T *insert(T &key)
     {  
         Node *t = new Node();  
         t->key = key;  
@@ -43,6 +43,7 @@ public:
         if(y==nil) head = t;  
         else y->ch[key > y->key] = t;  
         insert_fixup(t);  
+        return &t->key;
     }
     void remove(T &key)
     {  

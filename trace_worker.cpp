@@ -17,15 +17,32 @@ typedef int SOCKET;
 #include "trace_packet.h"
 #include "socket_opr.h"
 #include "SimpleIni.h"
-#include "link_tool.h"
-typedef struct TraceDeep
+#include "rb_tree.h"
+
+class CTraceWorkManager;
+class TraceDeep
 {
-    CBase::pthread_t tid;
-	int deep;
-    bool isCon;
-	node Node;
-}TraceDeep;
-#define TraceDeepContain(x) container_of((x), TraceDeep, Node)
+public:
+    friend class CTraceWorkManager;
+    TraceDeep(){}
+public:
+    bool operator > (const TraceDeep &key)
+    {
+        return m_tid > key.m_tid;
+    }
+    bool operator != (const TraceDeep &key)
+    {
+        return m_tid != key.m_tid;
+    }
+    bool operator == (const TraceDeep &key)
+    {
+        return m_tid == key.m_tid;
+    }
+private:
+    CBase::pthread_t m_tid;
+    int m_deep;
+    bool m_isCon;
+};
 
 class CTraceWorkManager
 {
@@ -55,8 +72,7 @@ private:
 	int send(char *szText,int len);	
     bool getServerInf(std::string &ip, int &port);
     
-    void removeTraceDeep(TraceDeep *traceDeep);
-    void destroyTraceDeep(TraceDeep *traceDeep);
+    void removeTraceDeep(TraceDeep &traceDeep);
     TraceDeep *getTraceDeep(CBase::pthread_t tid);
     TraceDeep *creatTraceDeep(CBase::pthread_t tid);
     static void* reConThread(void *pArg);
@@ -70,7 +86,7 @@ private:
 	CBase::pthread_mutex_t socketMutex;
 	int m_sessionId;
 	const int m_maxSessionId;
-    base::CList *m_pThreadList;
+    CRbTree<TraceDeep> m_threadTree;
     CBase::pthread_mutex_t m_threadListMutex;
     CBase::pthread_t m_reConnectThread;
 	static CTraceWorkManager _instance;
@@ -290,7 +306,6 @@ CTraceWorkManager::CTraceWorkManager()
 ,m_sessionId(1)
 ,m_maxSessionId(1024*1024)
 {
-    m_pThreadList = base::CList::createCList();
     CBase::pthread_mutex_init(&socketMutex, NULL);
     CBase::pthread_mutex_init(&m_threadListMutex, NULL);
 #ifdef WIN32	
@@ -301,8 +316,6 @@ CTraceWorkManager::CTraceWorkManager()
 
 CTraceWorkManager::~CTraceWorkManager()
 {
-    base::CList::destroyClist(m_pThreadList);
-	m_pThreadList = NULL;
 }
 
 bool CTraceWorkManager::startServer(const char *sip, int sport, const char *fileName)
@@ -517,19 +530,6 @@ int CTraceWorkManager::getSessionId(bool enabl)
 	return ++m_sessionId;
 }
 
-bool cmpTraceDeep(node *node1, node *node2)
-{
-	TraceDeep *tmpNode1 = TraceDeepContain(node1);
-	TraceDeep *tmpNode2 = TraceDeepContain(node2);
-	if (tmpNode1->tid == tmpNode2->tid)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
 
 int CTraceWorkManager::dealPacket(CLogDataInf &sendDataInf, CLogDataInf &recvDataInf)
 {
@@ -811,21 +811,21 @@ bool CTraceWorkManager::createCandy()
 {
     bool isStarted = g_trace->isStarted();
     TraceDeep *traceDeep = creatTraceDeep(CBase::pthread_self());
-    traceDeep->deep++;
+    traceDeep->m_deep++;
 
     if (isStarted)
     {
-        if (traceDeep->deep == 1)
+        if (traceDeep->m_deep == 1)
         {
-            traceDeep->isCon = true;
+            traceDeep->m_isCon = true;
         }
     }
     else
     {
-        traceDeep->isCon = false;
+        traceDeep->m_isCon = false;
     }
     
-    return traceDeep->isCon;
+    return traceDeep->m_isCon;
 }
 
 bool CTraceWorkManager::destroyCandy()
@@ -833,72 +833,51 @@ bool CTraceWorkManager::destroyCandy()
     TraceDeep *traceDeep = getTraceDeep(CBase::pthread_self());
     if(traceDeep)
     {
-        traceDeep->deep--;
-        if (traceDeep->deep == 0)
+        traceDeep->m_deep--;
+        if (traceDeep->m_deep == 0)
         {
-            removeTraceDeep(traceDeep);
-			destroyTraceDeep(traceDeep);
+            removeTraceDeep(*traceDeep);
         }
-        return traceDeep->isCon;
+        return traceDeep->m_isCon;
     }
 
     return false;
 }
 
-void CTraceWorkManager::removeTraceDeep(TraceDeep *traceDeep)
+void CTraceWorkManager::removeTraceDeep(TraceDeep &traceDeep)
 {
     CBase::pthread_mutex_lock(&m_threadListMutex);
-    node *pNode = m_pThreadList->find(&traceDeep->Node,cmpTraceDeep);    
-	if (pNode != NULL)
-	{
-		m_pThreadList->erase(pNode);
-	}    
+    m_threadTree.remove(traceDeep); 
     CBase::pthread_mutex_unlock(&m_threadListMutex);
 }
 
-void CTraceWorkManager::destroyTraceDeep(TraceDeep *pTraceDeep)
-{
-	base::free(pTraceDeep);
-}
 
 
 TraceDeep *CTraceWorkManager::getTraceDeep(CBase::pthread_t tid)
 {
     TraceDeep traceDeep;    
-    traceDeep.tid = tid;
+    traceDeep.m_tid = tid;
     
     CBase::pthread_mutex_lock(&m_threadListMutex);
-    node *pNode = m_pThreadList->find(&traceDeep.Node,cmpTraceDeep);
+    TraceDeep *pTraceDeep = m_threadTree.search(traceDeep);
     CBase::pthread_mutex_unlock(&m_threadListMutex);
     
-    if (pNode != NULL)
-	{
-		return TraceDeepContain(pNode);
-	}
-	return NULL;
+	return pTraceDeep;
 }
 
 TraceDeep *CTraceWorkManager::creatTraceDeep(CBase::pthread_t tid)
 {
     CBase::pthread_mutex_lock(&m_threadListMutex);
     TraceDeep traceDeep;    
-    traceDeep.tid = tid;
+    traceDeep.m_tid = tid;
     
-    node *pNode = m_pThreadList->find(&traceDeep.Node, cmpTraceDeep);
-    TraceDeep *pTraceDeep = NULL;
-    if (pNode != NULL)//如果查找到
+    TraceDeep *pTraceDeep = m_threadTree.search(traceDeep);
+	if (pTraceDeep == NULL)  
 	{
-		pTraceDeep = TraceDeepContain(pNode);
-	}
-	else  
-    {
-        pTraceDeep = (TraceDeep *)base::malloc(sizeof(TraceDeep));
-        assert(pTraceDeep != NULL);
-        
-        pTraceDeep->deep = 0;
-        pTraceDeep->tid = tid;
-        pTraceDeep->isCon = false;
-        m_pThreadList->push_back(&pTraceDeep->Node);
+        traceDeep.m_deep = 0;
+        traceDeep.m_tid = tid;
+        traceDeep.m_isCon = false;
+        pTraceDeep = m_threadTree.insert(traceDeep);
     }
     
     CBase::pthread_mutex_unlock(&m_threadListMutex);
