@@ -69,6 +69,11 @@ public:
     {
         return search(head, key);
     }    
+	
+    void clear()
+    {
+        clear(head);
+    }
     void out()
     {  
         dfs(head,0);
@@ -193,6 +198,19 @@ private:
             return search(t->ch[0], key);  
         }
     }
+	
+    void clear(Node *t)   
+    {  
+        if(t==nil)  
+        {
+            head = nil;
+            return ;  
+        }  
+        clear(t->ch[1]);  
+        clear(t->ch[0]);
+        delete t;
+    }
+    
     void dfs(Node *t,int d)
     {  
         if(t==nil)  
