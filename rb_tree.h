@@ -48,7 +48,7 @@ public:
     void remove(T &key)
     {  
         Node *t= head,*y;  
-        while(t!=nil&&t->key!=key) t = t->ch[key>t->key];
+        while(t!=nil&&!(t->key==key)) t = t->ch[key>t->key];
         if(t==nil) return ;  
         if(t->ch[0]==nil||t->ch[1]==nil) y = t;
         else y = successor(t);  
