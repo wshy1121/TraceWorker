@@ -74,10 +74,9 @@ public:
     {
         clear(head);
     }
-    void out()
+    void out(int cid = 0)
     {  
-        dfs(head,0);
-        std::cout<<std::endl;  
+        dfs(head, cid);
     }  
 private:
     Node *successor(Node *t)
@@ -211,15 +210,15 @@ private:
         delete t;
     }
     
-    void dfs(Node *t,int d)
+    void dfs(Node *t, int cid)
     {  
         if(t==nil)  
         {  
             return ;  
         }  
-        std::cout<<" "<<t->key.getInf()<<" "<<(t->color==BLACK?'B':'R')<<" "<<std::endl;  
-        dfs(t->ch[0],d+(t->color==BLACK));  
-        dfs(t->ch[1],d+(t->color==BLACK));  
+        t->key(cid);
+        dfs(t->ch[0], cid);  
+        dfs(t->ch[1], cid);  
     }
 private:    
     Node *head,*nil;
