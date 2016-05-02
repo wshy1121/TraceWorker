@@ -30,10 +30,7 @@ public:
     {
         return m_tid > key.m_tid;
     }
-    bool operator != (const TraceDeep &key)
-    {
-        return m_tid != key.m_tid;
-    }
+
     bool operator == (const TraceDeep &key)
     {
         return m_tid == key.m_tid;
@@ -87,7 +84,7 @@ private:
 	int m_sessionId;
 	const int m_maxSessionId;
     CRbTree<TraceDeep> m_threadTree;
-    CBase::pthread_mutex_t m_threadListMutex;
+    CBase::pthread_mutex_t m_threadTreeMutex;
     CBase::pthread_t m_reConnectThread;
 	static CTraceWorkManager _instance;
 };
@@ -307,7 +304,7 @@ CTraceWorkManager::CTraceWorkManager()
 ,m_maxSessionId(1024*1024)
 {
     CBase::pthread_mutex_init(&socketMutex, NULL);
-    CBase::pthread_mutex_init(&m_threadListMutex, NULL);
+    CBase::pthread_mutex_init(&m_threadTreeMutex, NULL);
 #ifdef WIN32	
 	WSADATA wsa={0};
 	WSAStartup(MAKEWORD(2,2),&wsa);
@@ -846,9 +843,9 @@ bool CTraceWorkManager::destroyCandy()
 
 void CTraceWorkManager::removeTraceDeep(TraceDeep &traceDeep)
 {
-    CBase::pthread_mutex_lock(&m_threadListMutex);
+    CBase::pthread_mutex_lock(&m_threadTreeMutex);
     m_threadTree.remove(traceDeep); 
-    CBase::pthread_mutex_unlock(&m_threadListMutex);
+    CBase::pthread_mutex_unlock(&m_threadTreeMutex);
 }
 
 
@@ -858,16 +855,16 @@ TraceDeep *CTraceWorkManager::getTraceDeep(CBase::pthread_t tid)
     TraceDeep traceDeep;    
     traceDeep.m_tid = tid;
     
-    CBase::pthread_mutex_lock(&m_threadListMutex);
+    CBase::pthread_mutex_lock(&m_threadTreeMutex);
     TraceDeep *pTraceDeep = m_threadTree.search(traceDeep);
-    CBase::pthread_mutex_unlock(&m_threadListMutex);
+    CBase::pthread_mutex_unlock(&m_threadTreeMutex);
     
 	return pTraceDeep;
 }
 
 TraceDeep *CTraceWorkManager::creatTraceDeep(CBase::pthread_t tid)
 {
-    CBase::pthread_mutex_lock(&m_threadListMutex);
+    CBase::pthread_mutex_lock(&m_threadTreeMutex);
     TraceDeep traceDeep;    
     traceDeep.m_tid = tid;
     
@@ -880,7 +877,7 @@ TraceDeep *CTraceWorkManager::creatTraceDeep(CBase::pthread_t tid)
         pTraceDeep = m_threadTree.insert(traceDeep);
     }
     
-    CBase::pthread_mutex_unlock(&m_threadListMutex);
+    CBase::pthread_mutex_unlock(&m_threadTreeMutex);
     return pTraceDeep;
 }
 
