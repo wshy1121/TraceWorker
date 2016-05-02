@@ -647,6 +647,7 @@ int CTraceWorkManager::send(char *szText,int len)
 		{
 		    if (errno == ECONNRESET || errno == EPIPE)
             {
+                CBase::close(m_socketClient);
                 m_socketClient = -1;
                 printf("ECONNRESET  || EPIPE  %d\n", errno);
                 break;
