@@ -91,6 +91,10 @@ private:
 
 static CTraceWorkManager *g_trace = CTraceWorkManager::instance();
 
+static void handlePipe(int sig)
+{
+}
+
 CCandy::CCandy(int line, char *file_name, char *func_name, int pre_line, char *pre_file_name, char *pre_func_name, int display_level)
 {
 	if (!g_trace->createCandy())
@@ -309,6 +313,12 @@ CTraceWorkManager::CTraceWorkManager()
 	WSADATA wsa={0};
 	WSAStartup(MAKEWORD(2,2),&wsa);
 #endif
+
+    struct sigaction action;
+    action.sa_handler = handlePipe;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+    sigaction(SIGPIPE, &action, NULL);
 }
 
 CTraceWorkManager::~CTraceWorkManager()
