@@ -43,9 +43,9 @@ ELSEIF (UNIX)
     TARGET_LINK_LIBRARIES(TraceWorker)
 ENDIF (WIN32)
 
-ADD_EXECUTABLE(test ${SRC_SRCS} main.cpp)
+ADD_EXECUTABLE(test main.cpp)
 # link library
-TARGET_LINK_LIBRARIES(test  pthread)
+TARGET_LINK_LIBRARIES(test  TraceWorker pthread)
 
 # clean
 SET_TARGET_PROPERTIES(TraceWorker PROPERTIES CLEAN_DIRECT_OUTPUT 1)

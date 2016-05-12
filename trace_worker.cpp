@@ -655,19 +655,16 @@ int CTraceWorkManager::send(char *szText,int len)
 		rc=::send(m_socketClient,szText,cnt,0);
 		if(rc <= 0)
 		{
-		    if (errno == ECONNRESET || errno == EPIPE)
+		    if (errno == EAGAIN && ++tryTime < 1000)
             {
-                CBase::close(m_socketClient);
-                m_socketClient = -1;
-                printf("ECONNRESET  || EPIPE  %d\n", errno);
-                break;
-            }      
-		    CBase::usleep(1000);
-            if (++tryTime == 1000)
-            {
-                break;
+                CBase::usleep(1000);
+                continue;
             }
-            continue;
+
+            CBase::close(m_socketClient);
+            m_socketClient = -1;
+            printf("send errno is %d\n", errno);
+            break;
 		}
 		szText += rc;
 		cnt -= rc;
