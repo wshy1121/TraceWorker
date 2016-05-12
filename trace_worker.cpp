@@ -709,7 +709,7 @@ void CTraceWorkManager::InsertHex(int line, char *file_name, char *psBuf, int nB
 void CTraceWorkManager::packetHex(char *psBuf, int nBufLen, char *str, int strLen)
 {
 	/* save log msg in file */
-	CBase::snprintf(str, strLen, "hex%s:len=%4d\n", __FUNCTION__, nBufLen);
+	CBase::snprintf(str, strLen, "hex%s:len=%4d\r\n", __FUNCTION__, nBufLen);
 	int curStrLen = strlen(str);
 
 	/* save log msg in file */
@@ -747,7 +747,7 @@ void CTraceWorkManager::packetHex(char *psBuf, int nBufLen, char *str, int strLe
 		if (j==16)
 		{
 			sLine[77]=0;
-			CBase::snprintf(str+strlen(str), strLen-strlen(str), "%s\n", sLine);
+			CBase::snprintf(str+strlen(str), strLen-strlen(str), "%s\r\n", sLine);
 			j=0;
 			curStrLen += strlen(sLine) + 1;
 			if (curStrLen > (strLen-1))
@@ -761,7 +761,7 @@ void CTraceWorkManager::packetHex(char *psBuf, int nBufLen, char *str, int strLe
 	if (j)
 	{
 		sLine[77]=0;
-		CBase::snprintf(str+strlen(str), strLen-strlen(str), "%s\n",	sLine);
+		CBase::snprintf(str+strlen(str), strLen-strlen(str), "%s\r\n",	sLine);
 		curStrLen += strlen(sLine) + 1;
 	}
 
