@@ -86,7 +86,8 @@ int main()
 	memset(testData, 'A', dataLen);
 	testData[dataLen-1] = '\n';
 	
-	trace_start("127.0.0.1", 880110, "/root/nfs/Log/TraceWorkerDebug.cpp");
+	//trace_start("127.0.0.1", 880110, "/root/nfs/Log/TraceWorkerDebug.cpp");
+	trace_start("127.0.0.1", 880110, "huangyuan1:7ujMko0admin@ftp://10.17.128.105:21/Log/1111TraceWorkerDebug.cpp");
 	const int threadNum = 10;
 	CBase::pthread_t thread_id[threadNum];	
 
