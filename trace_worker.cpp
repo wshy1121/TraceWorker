@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <string.h>
-#include<linux/tcp.h>
+#include <netinet/tcp.h>
 typedef int SOCKET;
 #endif
 #include <map>
