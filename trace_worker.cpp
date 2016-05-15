@@ -655,9 +655,9 @@ int CTraceWorkManager::send(char *szText,int len)
 		rc=::send(m_socketClient,szText,cnt,0);
 		if(rc <= 0)
 		{
-		    if (errno == EAGAIN && ++tryTime < 8)
+		    if (errno == EAGAIN && ++tryTime < 64)
             {
-                CBase::usleep(8000);
+                CBase::usleep(1000);
                 continue;
             }
 
