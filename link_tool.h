@@ -37,7 +37,7 @@ public:
 	void pop_back();
 	bool empty();
 	void clear();
-	int size();
+	size_t size();
 	node *getHead();
 	node *find(node *cmpNode, bool (*cmpFuc)(node *node1, node *node2));
 	node *erase(node *pNode);
@@ -54,22 +54,22 @@ public:
 typedef struct CStrNode
 {
 public:
-	static CStrNode *createCStrNode(int maxStrLen);
+	static CStrNode *createCStrNode(size_t maxStrLen);
 	static void destroyCStrNode(CStrNode *pNode);
 public:
 	node *getNode();
-	int size();
-	void setStr(char *str, int strLen = -1);
+	size_t size();
+	void setStr(char *str, size_t strLen = 0);
 	char *getStr();
-	int writeStr(char *str);
+	size_t writeStr(char *str);
 private:
-	void init(int maxStrLen);
+	void init(size_t maxStrLen);
 	void exit();
 public:
 	struct node m_node;
 	char *m_str;
-	int m_strLen;
-	int m_remainMem;
+	size_t m_strLen;
+	size_t m_remainMem;
 }CStrNode;
 #define TStrNodeContain(x) container_of((x), CStrNode, m_node)
 
@@ -82,7 +82,7 @@ public:
 	void append(char *str);
 	void append(const char *str);
 	char *c_str();
-	int size();
+	size_t size();
 	void clear();
 private:
 	void init();
@@ -90,8 +90,8 @@ private:
 private:
 	CList *m_pStrList;
 	CStrNode *m_lastStrNode;
-	int m_strLen;
-	int m_maxStrNodeLen;
+	size_t m_strLen;
+	size_t m_maxStrNodeLen;
 };
 
 

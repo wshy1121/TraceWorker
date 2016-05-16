@@ -127,7 +127,7 @@ void CList::clear()
 	}		
 }
 
-int CList::size()
+size_t CList::size()
 {
 	return node_num;
 }
@@ -160,7 +160,7 @@ node *CList::erase(node *pNode)
 	return pNodeNext;
 }
 
-void CStrNode::init(int maxStrLen)
+void CStrNode::init(size_t maxStrLen)
 {
 	m_strLen = 0;
 	m_remainMem = 0;
@@ -181,7 +181,7 @@ void CStrNode::exit()
 	m_str = NULL;
 	m_strLen = 0;
 }
-CStrNode *CStrNode::createCStrNode(int maxStrLen)
+CStrNode *CStrNode::createCStrNode(size_t maxStrLen)
 {
 	CStrNode *pNode = (CStrNode *)base::malloc(sizeof(CStrNode));
 	if (pNode)
@@ -203,15 +203,15 @@ void CStrNode::destroyCStrNode(CStrNode *pNode)
 	base::free(pNode);
 }
 
-int CStrNode::writeStr(char *str)
+size_t CStrNode::writeStr(char *str)
 {
 	if (m_remainMem <= 0)
 	{
 		return 0;
 	}
 	
-	int strLen = (int)strlen(str);
-	int writeLen = m_remainMem > strLen ? strLen:m_remainMem;
+	size_t strLen = strlen(str);
+	size_t writeLen = (size_t)m_remainMem > strLen ? strLen:m_remainMem;
 
 	memcpy(m_str + m_strLen, str, writeLen);
 	m_strLen += writeLen;
@@ -224,16 +224,17 @@ node *CStrNode::getNode()
 {
 	return &m_node;
 }
- int CStrNode::size()
+
+size_t CStrNode::size()
 {
 	return m_strLen;
 }
 
-void CStrNode::setStr(char *str, int strLen)
+void CStrNode::setStr(char *str, size_t strLen)
 {
-	if (strLen == -1)
+	if (strLen == 0)
 	{
-		strLen = (int)strlen(str);
+		strLen = strlen(str);
 	}
 	m_strLen = strLen;	
 	m_str = str;
@@ -305,7 +306,8 @@ void CString::destroyCString(CString *pCString)
 	pCString->exit();
 	base::free(pCString);
 }
- int CString::size()
+
+size_t CString::size()
 {
 	return m_strLen;
 }
@@ -322,9 +324,9 @@ void CString::append(char *str)
 		m_pStrList->push_back(m_lastStrNode->getNode());
 	}
 	
-	int remainLen = (int)strlen(str);
-	int pos = 0;
-	int writeLen = 0;
+	size_t remainLen = strlen(str);
+	size_t pos = 0;
+	size_t writeLen = 0;
 
 	m_strLen += remainLen;
 
@@ -362,7 +364,7 @@ char *CString::c_str()
 		return pStrNode->getStr();
 	}
 	
-	int newStrLen = m_maxStrNodeLen > m_strLen ? m_maxStrNodeLen : m_strLen;
+	size_t newStrLen = m_maxStrNodeLen > m_strLen ? m_maxStrNodeLen : m_strLen;
 	newStrNode = CStrNode::createCStrNode(newStrLen);
 	
 	while (m_pStrList->size())
